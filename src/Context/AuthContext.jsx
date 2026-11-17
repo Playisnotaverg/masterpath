@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { supabase } from '../supabaseClient'
-import { guestStart, guestStartIfAny } from '../lib/trial'
+import { guestStart, guestStartIfAny } from '../Lib/trial'
 
 const AuthContext = createContext(null)
 const GUEST_KEY = 'mp_guest'
