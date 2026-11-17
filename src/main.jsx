@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { AuthProvider } from './Context/AuthContext'
+import { AuthProvider } from './context/AuthContext'
 import App from './App'
 import EnvBanner from './components/EnvBanner'
 import './stripeConfig'
