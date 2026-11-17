@@ -5,6 +5,7 @@ import { guestStart, guestStartIfAny } from '../Lib/trial'
 const AuthContext = createContext(null)
 const GUEST_KEY = 'mp_guest'
 
+
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(true)
