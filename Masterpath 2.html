@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark"><title>Masterpath</title>
+<style>
+:root{--bg:#030305;--c1:#0b0c11;--glass:rgba(18,20,28,.66);--bd:rgba(255,255,255,.07);--tx:#f5f6fa;--mut:#858a9b;--ac:#6f7ce0;--ac2:#3cbfa3;--gold:#d9ac5a;--ok:#2fb86f;--warn:#e08a3a;--pro:#9a6fe0;--sp:cubic-bezier(.32,1.3,.5,1);
+--font:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Inter,Arial,sans-serif;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;height:100%;background:var(--bg);color:var(--tx);font-family:var(--font);display:flex;justify-content:center;overflow:hidden}
+#app{position:relative;width:100%;max-width:430px;height:100%;overflow:hidden;background:radial-gradient(120% 60% at 80% -10%,rgba(111,124,224,.13),transparent 60%),radial-gradient(90% 50% at -10% 20%,rgba(60,191,163,.07),transparent 60%),var(--bg)}
+@media(min-width:600px){body{align-items:center}#app{height:min(900px,96vh);border-radius:44px;border:1px solid var(--bd);box-shadow:0 30px 80px rgba(0,0,0,.5)}}
+.scr{position:absolute;inset:0;overflow-y:auto;padding:22px 18px 110px;display:none}
+.scr.on{display:block;animation:in .45s var(--sp)}
+@keyframes in{from{opacity:0;transform:translateX(var(--dx,0px)) scale(.985)}to{opacity:1;transform:none}}
+h1{font-size:34px;letter-spacing:-.8px;margin:6px 0 4px;line-height:1.08}
+h2{font-size:21px;letter-spacing:-.4px;margin:22px 0 10px}
+h3{font-size:16px;margin:0 0 3px}
+p{margin:0;color:var(--mut);font-size:14px;line-height:1.45}
+.card{background:var(--glass);backdrop-filter:blur(22px) saturate(160%);-webkit-backdrop-filter:blur(22px) saturate(160%);border:1px solid var(--bd);border-radius:22px;padding:16px;margin-bottom:12px}
+.btn{border:0;border-radius:16px;padding:14px 18px;font:600 16px var(--font);color:#fff;background:linear-gradient(135deg,var(--ac),#8a63d6);width:100%;cursor:pointer;transition:transform .25s var(--sp)}
+.btn:active{transform:scale(.96)}.btn.g{background:var(--glass);color:var(--tx);border:1px solid var(--bd)}
+.btn:disabled{opacity:.45}
+.search{display:flex;align-items:flex-start;gap:10px;padding:14px 16px;border-radius:22px;background:var(--glass);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border:1px solid var(--bd);margin:14px 0 10px}
+.search textarea{flex:1;background:none;border:0;outline:0;resize:none;color:var(--tx);font:500 17px var(--font);height:74px}
+.search textarea::placeholder{color:var(--mut)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.chip{padding:8px 13px;border-radius:99px;background:var(--glass);border:1px solid var(--bd);font-size:13px;color:var(--tx);cursor:pointer}
+.bar{height:9px;border-radius:9px;background:rgba(127,127,160,.22);overflow:hidden;margin:8px 0 4px}
+.bar i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,var(--ac2),var(--ac));transition:width .9s var(--sp)}
+.row{display:flex;align-items:center;gap:12px}.sp{flex:1}
+.tag{font-size:12px;padding:3px 9px;border-radius:99px;background:rgba(111,124,224,.18);color:var(--ac)}
+nav{position:absolute;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));display:flex;padding:8px;border-radius:30px;background:var(--glass);backdrop-filter:blur(26px) saturate(180%);-webkit-backdrop-filter:blur(26px) saturate(180%);border:1px solid var(--bd);z-index:20}
+nav button{flex:1;background:none;border:0;color:var(--mut);display:flex;flex-direction:column;align-items:center;gap:3px;font:600 11px var(--font);padding:6px 0;border-radius:22px;cursor:pointer;transition:all .3s var(--sp)}
+nav button.on{color:var(--ac);background:rgba(111,124,224,.15)}
+nav svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.sheet-bg{position:absolute;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:40;opacity:0;pointer-events:none;transition:opacity .3s}
+.sheet-bg.on{opacity:1;pointer-events:auto}
+.sheet{position:absolute;left:0;right:0;bottom:0;max-height:92%;overflow-y:auto;z-index:41;background:var(--c1);border-radius:30px 30px 0 0;border:1px solid var(--bd);padding:10px 20px calc(26px + env(safe-area-inset-bottom,0px));transform:translateY(105%);transition:transform .55s var(--sp)}
+.sheet.on{transform:none}
+.grab{width:40px;height:5px;border-radius:5px;background:var(--mut);opacity:.4;margin:0 auto 14px}
+.opt{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:16px;border:1.5px solid var(--bd);margin-bottom:8px;cursor:pointer;transition:all .25s var(--sp)}
+.opt.sel{border-color:var(--ac);background:rgba(111,124,224,.14);transform:scale(1.015)}
+.opt b{font-size:15px}.opt .e{font-size:22px}
+input[type=range]{width:100%;accent-color:var(--ac);height:30px}
+.lbl{font-size:13px;color:var(--mut);margin:14px 0 8px;font-weight:600}
+.phase{margin-top:16px}
+.task{display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--bd)}
+.ck{flex:none;width:26px;height:26px;border-radius:50%;border:2px solid var(--mut);background:none;display:grid;place-items:center;color:#fff;cursor:pointer;font-size:14px;transition:all .3s var(--sp);padding:0}
+.done .ck{background:var(--ok);border-color:var(--ok);transform:scale(1.1)}
+.done h3{text-decoration:line-through;opacity:.6}
+.vid{display:flex;gap:10px;margin-top:10px;padding:10px;border-radius:14px;background:rgba(111,124,224,.1);border:1px solid var(--bd)}
+.vid .pl{flex:none;width:76px;height:52px;border-radius:10px;background:linear-gradient(135deg,#2b2f55,#6f7ce0);display:grid;place-items:center;font-size:20px;text-decoration:none;color:#fff}
+.vid ul{margin:4px 0 0;padding-left:16px;font-size:12.5px;color:var(--mut);line-height:1.5}
+.fb{border-radius:16px;padding:12px 14px;margin-bottom:9px;display:flex;gap:10px;font-size:14px;line-height:1.4}
+.fb.ok{background:rgba(47,184,111,.14)}.fb.fix{background:rgba(224,138,58,.14)}.fb.pro{background:rgba(176,124,255,.16)}
+.fb em{font-style:normal;font-weight:700;display:block;margin-bottom:2px}
+.badge{aspect-ratio:1;border-radius:26px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:12px;gap:6px;border:1px solid var(--bd);background:var(--glass);cursor:pointer;transition:transform .3s var(--sp)}
+.badge:active{transform:scale(.95)}
+.badge.won{background:radial-gradient(circle at 50% 30%,rgba(217,172,90,.45),rgba(111,124,224,.18));box-shadow:0 0 34px rgba(217,172,90,.35);border-color:rgba(217,172,90,.6);animation:glow 3s ease-in-out infinite}
+@keyframes glow{50%{box-shadow:0 0 52px rgba(217,172,90,.55)}}
+.badge.lock{opacity:.4}.badge .ic{font-size:40px}.badge b{font-size:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.badge{position:relative}.x{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;border:1px solid var(--bd);background:var(--glass);color:var(--mut);font-size:13px;cursor:pointer;display:grid;place-items:center;padding:0}
+.stat{text-align:center}.stat b{font-size:28px;display:block;letter-spacing:-.5px}
+.spin{width:44px;height:44px;border-radius:50%;border:4px solid rgba(127,127,160,.25);border-top-color:var(--ac);animation:sp 0.9s linear infinite;margin:26px auto 12px}
+@keyframes sp{to{transform:rotate(360deg)}}
+video{width:100%;border-radius:16px;max-height:220px;background:#000;margin-bottom:12px}
+.toast{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));left:50%;transform:translate(-50%,-90px);background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--bd);padding:10px 18px;border-radius:99px;font-size:14px;font-weight:600;z-index:60;transition:transform .5s var(--sp)}
+.toast.on{transform:translate(-50%,0)}
+.back{background:none;border:0;color:var(--ac);font:600 16px var(--font);padding:0;cursor:pointer;margin-bottom:6px}
+.dots{display:flex;gap:6px;margin:6px 0 14px}.dots i{flex:1;height:5px;border-radius:5px;background:rgba(127,127,160,.25);transition:background .4s}.dots i.on{background:var(--ac2)}
+.cbub{display:flex;gap:10px;margin-bottom:14px}.cbub .av{flex:none;width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--ac2));display:grid;place-items:center;font-size:20px}.cbub .tx{background:var(--glass);border:1px solid var(--bd);border-radius:6px 18px 18px 18px;padding:12px 14px;font-size:15px;line-height:1.5}
+.cbub ul{margin:8px 0 0;padding-left:18px;color:var(--mut);font-size:14px;line-height:1.55}
+.go{flex:none;border:0;border-radius:99px;padding:7px 14px;background:rgba(111,124,224,.18);color:var(--ac);font:600 13px var(--font);margin-top:8px;cursor:pointer}
+.scanbtn{flex:none;width:60px;height:60px;margin:-24px 4px 0;border-radius:50%;border:2px solid rgba(255,255,255,.25);background:linear-gradient(135deg,var(--ac),var(--ac2));display:grid;place-items:center;box-shadow:0 0 24px rgba(111,124,224,.5),0 0 56px rgba(60,191,163,.22);animation:glowp 2.6s ease-in-out infinite;cursor:pointer;padding:0;transition:transform .3s var(--sp)}
+.scanbtn:active{transform:scale(.9)}nav .scanbtn svg{width:28px;height:28px;stroke:#fff;stroke-width:2}
+@keyframes glowp{50%{box-shadow:0 0 34px rgba(111,124,224,.75),0 0 80px rgba(60,191,163,.35)}}
+.vf{position:relative;border-radius:26px;min-height:190px;display:grid;place-items:center;text-align:center;padding:18px;border:1px solid var(--bd);background:linear-gradient(160deg,rgba(111,124,224,.16),rgba(60,191,163,.08));overflow:hidden}
+.vf:before,.vf:after{content:"";position:absolute;width:34px;height:34px;border:3px solid var(--ac2);border-radius:10px}.vf:before{top:12px;left:12px;border-right:0;border-bottom:0}.vf:after{bottom:12px;right:12px;border-left:0;border-top:0}
+.vf i{position:absolute;left:10%;right:10%;height:2px;background:linear-gradient(90deg,transparent,var(--ac2),transparent);animation:sweep 2.8s ease-in-out infinite}
+@keyframes sweep{0%,100%{top:16%}50%{top:84%}}
+.vf img{max-width:100%;max-height:260px;border-radius:16px}
+.ans{border-radius:24px;padding:18px;margin:14px 0 12px;background:linear-gradient(145deg,rgba(111,124,224,.17),rgba(60,191,163,.08));border:1px solid rgba(111,124,224,.5);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px)}
+.live{background:#ff453a!important;color:#fff!important;animation:glowr 1s ease-in-out infinite}
+@keyframes glowr{50%{box-shadow:0 0 0 8px rgba(255,69,58,.25)}}
+.sinp{flex:1;min-width:0;background:none;border:1px solid var(--bd);border-radius:12px;padding:10px;color:var(--tx);font:15px var(--font);outline:0}
+.num{flex:none;width:28px;height:28px;border-radius:50%;background:rgba(111,124,224,.2);color:var(--ac);display:grid;place-items:center;font-weight:700;font-size:14px}
+.act{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:16px;border-radius:24px;border:1px solid var(--bd);background:var(--glass);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);color:var(--tx);font:inherit;text-decoration:none;cursor:pointer;transition:transform .3s var(--sp)}
+.act:active{transform:scale(.97)}
+.act .ai{flex:none;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-size:20px;background:rgba(111,124,224,.2)}
+.act .at{flex:1;display:flex;flex-direction:column;gap:2px}.act .at b{font-size:16px}.act .at small{color:var(--mut);font-size:13px}.act .ch{color:var(--mut);font-size:26px;line-height:1}
+.act.dng{border-color:rgba(255,69,58,.4);background:rgba(255,69,58,.1)}.act.dng .ai{background:rgba(255,69,58,.2);color:#ff6b61}.act.off{opacity:.6;cursor:default}
+.so{position:absolute;inset:0;z-index:70;overflow-y:auto;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;background:radial-gradient(120% 60% at 80% -10%,rgba(111,124,224,.13),transparent 60%),var(--bg)}
+html{color-scheme:dark}
+.btn,.chip,.opt,.go,.act,.badge,.x,nav button,.card[onclick]{transition:transform .35s var(--sp),background .25s,box-shadow .25s,border-color .25s}
+.btn:active,.chip:active,.opt:active,.go:active,.act:active,.badge:active,nav button:active,.card[onclick]:active{transform:scale(.94)}
+.scr.on>*{animation:rise .62s var(--sp) both}
+.scr.on>*:nth-child(2){animation-delay:.04s}.scr.on>*:nth-child(3){animation-delay:.08s}.scr.on>*:nth-child(4){animation-delay:.12s}.scr.on>*:nth-child(5){animation-delay:.16s}.scr.on>*:nth-child(6){animation-delay:.2s}.scr.on>*:nth-child(n+7){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.bar i{transform-origin:left;animation:grow 1s var(--sp) both}@keyframes grow{from{transform:scaleX(0)}}
+nav button.on svg{animation:pop .5s var(--sp)}@keyframes pop{0%{transform:scale(.7)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
+.ck{transition:transform .4s var(--sp),background .25s}
+.ph{position:absolute;left:0;right:0;top:2px;pointer-events:none;display:flex;gap:.32em;align-items:center;height:26px;overflow:hidden;font:500 17px var(--font);color:var(--mut);transition:opacity .2s}
+.has .ph{opacity:0}
+.phw{display:inline-block;color:var(--tx);font-weight:600;transition:transform .42s var(--sp),opacity .3s,filter .3s;white-space:nowrap}
+.phw.out{transform:translateY(-130%);opacity:0;filter:blur(6px)}.phw.pre{transform:translateY(130%);opacity:0;filter:blur(6px);transition:none}
+.cf{position:absolute;left:50%;top:45%;z-index:80;pointer-events:none}
+.cf i{position:absolute;width:8px;height:12px;border-radius:2px;animation:fly 1.1s cubic-bezier(.2,.8,.3,1) forwards}
+@keyframes fly{to{transform:translate(var(--x),var(--y)) rotate(var(--r));opacity:0}}
+
+/* ---------- scan page v2 ---------- */
+.eyebrow{font:600 11px var(--font);letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+.ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.segc{display:flex;gap:4px;padding:4px;margin:14px 0 16px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid var(--bd);width:fit-content;max-width:100%}
+.segc button{display:flex;align-items:center;gap:0;padding:9px 11px;border:0;border-radius:12px;background:none;color:var(--mut);font:600 13px var(--font);cursor:pointer;transition:all .4s var(--sp)}
+.segc button span{max-width:0;overflow:hidden;white-space:nowrap;opacity:0;transition:max-width .45s var(--sp),opacity .25s,margin .3s}
+.segc button.on{background:rgba(255,255,255,.1);color:var(--tx);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.segc button.on span{max-width:130px;opacity:1;margin-left:7px}
+.vf2{position:relative;height:min(44vh,370px);border-radius:28px;overflow:hidden;cursor:pointer;background:radial-gradient(120% 90% at 50% 0%,rgba(255,255,255,.05),transparent 60%),#07080b;border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 0 80px rgba(0,0,0,.7),0 24px 50px -24px rgba(0,0,0,.9)}
+.vf2 .grid{position:absolute;inset:0;width:100%;height:100%;stroke:rgba(255,255,255,.06);stroke-width:.4;fill:none}
+.vf2 .c{position:absolute;width:26px;height:26px;border:2px solid rgba(255,255,255,.55);animation:breathe 3s ease-in-out infinite}
+.c.tl{top:18px;left:18px;border-right:0;border-bottom:0;border-top-left-radius:9px}.c.tr{top:18px;right:18px;border-left:0;border-bottom:0;border-top-right-radius:9px}.c.bl{bottom:18px;left:18px;border-right:0;border-top:0;border-bottom-left-radius:9px}.c.br{bottom:18px;right:18px;border-left:0;border-top:0;border-bottom-right-radius:9px}
+@keyframes breathe{50%{transform:scale(.92);opacity:.6}}
+.vf2 .sweep{position:absolute;left:8%;right:8%;top:16%;height:1px;background:linear-gradient(90deg,transparent,rgba(111,124,224,.9),transparent);box-shadow:0 0 14px rgba(111,124,224,.7);animation:sweep 3.4s ease-in-out infinite}
+.vf2.busy .sweep{animation-duration:1.1s}
+.vf-mid{position:absolute;inset:0;display:grid;place-items:center;padding:36px}
+.vf-mid img{max-width:100%;max-height:100%;border-radius:14px;object-fit:contain;box-shadow:0 10px 40px rgba(0,0,0,.6)}
+.vf-hint{text-align:center}.vf-hint b{display:block;font-size:21px;letter-spacing:-.3px}.vf-hint span{display:block;margin-top:9px;font-size:12px;letter-spacing:.05em;color:var(--mut);line-height:1.7}
+.dock{display:flex;align-items:center;justify-content:space-between;padding:22px 10px 4px}
+.dbtn{display:flex;flex-direction:column;align-items:center;gap:7px;width:64px;background:none;border:0;color:var(--tx);font:500 11px var(--font);cursor:pointer}
+.dbtn .ic{width:46px;height:46px;padding:12px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid var(--bd)}
+.dbtn.live{background:none!important;animation:none}.dbtn.live .ic{background:#ff453a;border-color:#ff453a;color:#fff;animation:glowr 1s ease-in-out infinite}
+.shutter{width:78px;height:78px;border-radius:50%;border:3px solid rgba(255,255,255,.9);background:none;padding:5px;cursor:pointer;transition:transform .3s var(--sp)}
+.shutter i{display:block;width:100%;height:100%;border-radius:50%;background:#f4f5f8;transition:transform .25s var(--sp)}
+.shutter:active{transform:scale(.92)}.shutter:active i{transform:scale(.85)}
+.qrow{position:relative;margin-top:14px}.qrow .sinp{width:100%;padding:14px 52px 14px 18px;border-radius:99px;font-size:15px;background:rgba(255,255,255,.04)}
+.qgo{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;border:0;background:var(--tx);color:#000;display:grid;place-items:center;cursor:pointer;padding:0}
+.ans2{margin:14px 0 6px;padding:20px;border-radius:26px;background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.09);box-shadow:0 20px 40px -24px rgba(0,0,0,.9)}
+.ans2 h2{margin:8px 0 10px;font-size:24px;letter-spacing:-.5px}.ans-t{font-size:16px;line-height:1.55;white-space:pre-wrap;color:#e9eaf0}
+.res-top{display:flex;align-items:center;justify-content:space-between}.thumb{width:44px;height:44px;border-radius:12px;object-fit:cover;border:1px solid var(--bd)}
+.st{position:relative;display:flex;gap:14px;padding-bottom:18px}.st:not(:last-child):before{content:"";position:absolute;left:13px;top:32px;bottom:2px;width:1px;background:linear-gradient(var(--bd),transparent)}
+.st .dot{flex:none;width:27px;height:27px;border-radius:50%;display:grid;place-items:center;font:600 12px var(--font);background:rgba(255,255,255,.07);border:1px solid var(--bd)}
+.st h3{font-size:15px}.st p{margin-top:3px;color:#c9ccd6}
+.ask{display:flex;align-items:center;gap:8px;padding:6px 6px 6px 18px;border-radius:99px;background:rgba(255,255,255,.05);border:1px solid var(--bd);margin-top:6px}
+.ask input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--tx);font:15px var(--font)}
+.ask .ib{width:38px;height:38px;border-radius:50%;border:0;background:rgba(255,255,255,.08);color:var(--tx);display:grid;place-items:center;cursor:pointer;padding:0}
+.ask .ib.send{background:var(--tx);color:#000}
+.listen{display:inline-flex;align-items:center;gap:8px;padding:11px 16px;border-radius:99px;border:1px solid var(--bd);background:rgba(255,255,255,.05);color:var(--tx);font:600 14px var(--font);cursor:pointer;margin:10px 8px 0 0}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01s!important}}
+</style></head>
+<body>
+<div id="app">
+ <section class="scr on" id="home"></section>
+ <section class="scr" id="path"></section>
+ <section class="scr" id="library"></section>
+ <section class="scr" id="coach"></section>
+ <section class="scr" id="profile"></section>
+ <section class="scr" id="scan"></section>
+ <nav id="nav"></nav>
+ <div class="sheet-bg" id="bg"></div>
+ <div class="sheet" id="sheet"></div>
+ <div class="toast" id="toast"></div>
+ <div class="so" id="so"></div>
+ <div class="so" id="pw"></div>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+const IC={home:'<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',library:'<rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="16" rx="1"/><path d="M17 6l4 1-3 13-4-1"/>',coach:'<rect x="3" y="6" width="13" height="12" rx="3"/><path d="M16 10l5-3v10l-5-3"/>',profile:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>'};
+const TABS=[["home","Home"],["library","Library"],["coach","Coach"],["profile","Profile"]];
+const STYLES={Visual:["🎨","Diagrams, formulas and visual breakdowns"],Auditory:["🎧","Audio notes and talk-throughs"],"Reading/Writing":["📖","Deep written breakdowns"],"Hands On":["🤸","Hands-on action drills"]};
+const BASE=["Total beginner","Intermediate","Pro"];
+const LEVELS=["Casual Explorer","Steady Learner","Committed","Intensive Bootcamp"];
+let S={paths:[],fb:[],tab:"home",cur:null,streak:0,last:null};
+try{const x=localStorage.getItem(DK());if(x)S=Object.assign(S,JSON.parse(x))}catch(e){}
+S.paths.forEach(p=>{if(p.style==="Kinesthetic")p.style="Hands On"});if(S.style==="Kinesthetic")S.style="Hands On";
+const DK=()=>{try{const c=localStorage.getItem("mp_cur");return c?"mp_d_"+c:"mp1"}catch(e){return"mp1"}};
+const freshS=()=>({paths:[],fb:[],tab:"home",cur:null,streak:0,last:null});
+const save=()=>{try{localStorage.setItem(DK(),JSON.stringify(S))}catch(e){}};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+
+/* ---------- navigation ---------- */
+const ORD=['home','path','library','scan','coach','profile'];
+function go(t){const dx=ORD.indexOf(t)>=ORD.indexOf(S.tab)?'26px':'-26px';S.tab=t;document.querySelectorAll(".scr").forEach(e=>e.classList.remove("on"));const el=$("#"+t);el.style.setProperty('--dx',dx);el.classList.add("on");render()}
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove("on"),2200)}
+function openSheet(h){$("#sheet").innerHTML='<div class="grab"></div>'+h;$("#sheet").classList.add("on");$("#bg").classList.add("on")}
+function closeSheet(){LOCKSHEET=false;try{SPK++;speechSynthesis.cancel()}catch(e){}$("#sheet").classList.remove("on");$("#bg").classList.remove("on")}
+let LOCKSHEET=false;
+$("#bg").onclick=()=>{if(!LOCKSHEET)closeSheet()};
+
+/* ---------- curriculum engine (local; swap generate() for a real LLM call) ---------- */
+function pct(p){const t=p.phases.flatMap(x=>x.tasks);return Math.round(t.filter(x=>x.done).length/t.length*100)}
+function generateTpl(topic,style,lvl,base){
+ const n=[2,3,4,5][lvl], T=topic, b=BASE[base].toLowerCase();
+ const verb={Visual:"Watch and map",Auditory:"Listen and narrate",["Reading/Writing"]:"Read and write up","Hands On":"Practice"}[style];
+ const P=[
+  ["Phase 1: Foundations",["Map the big picture of "+T,"Learn the 5 core terms of "+T,"First guided attempt at "+T,"Spot the most common beginner mistakes","Set up your practice space for "+T]],
+  ["Phase 2: Build skill",["Drill one core technique in "+T,"Combine two techniques in "+T,"Slow-motion practice with self-review","Solve a real problem using "+T,"Compare your work to an expert’s"]],
+  ["Phase 3: Mastery",["Run a full "+T+" session end-to-end","Teach "+T+" to a friend in 2 minutes","Fix your weakest area in "+T,"Create a signature project in "+T,"Final showcase of your "+T+" skills"]]];
+ if(base===2)P[0][1][0]="Benchmark your current "+T+" level";
+ if(base===1)P[0][1].splice(0,2,"Fast skills check in "+T,"Fill your biggest gap in "+T);
+ return{id:Date.now(),topic:cap(T),style,lvl,base:b,created:Date.now(),
+  phases:P.map(([title,ts])=>({title,tasks:ts.slice(0,n).map((t,i)=>({t,d:verb+" · about "+[5,10,20,40][lvl]+" min",done:false,
+   v:style==="Visual"?{q:T+" "+t.replace(/^Phase.*/,"")+" tutorial short",w:["How the movement or process flows from start to finish","One detail beginners usually miss","What a ‘good’ result looks like"]}:null}))}))};
+}
+
+/* ---------- AI coach (simulated feedback; replace with a vision-model call) ---------- */
+const GOOD=["Your setup is clear and steady, which makes the skill easy to read","Your pace looks calm and controlled","You stayed committed from start to finish","Your posture and focus look confident","You showed up and practiced, and that is the hardest part"];
+const FIX=["Slow down the first second so your starting position is set before you move","Keep your eyes on the key point of the action instead of looking away","Make the movement or step smaller and cleaner, then speed up later","Reset between reps so each attempt starts from the same place"];
+const PRO=["Record from the side next week and compare it with today’s clip","Use a 3-count rhythm: prepare, do, finish","Say the one cue out loud while you practice, such as ‘smooth, not fast’","Finish every rep with a deliberate pause to lock the feel in"];
+function feedback(topic,seed){const r=(a,o)=>a[(seed+o)%a.length];return{topic,ok:[r(GOOD,0),r(GOOD,2)],fix:r(FIX,1),pro:r(PRO,3),t:Date.now()}}
+
+function analyze(topic,file,after){
+ openSheet('<h2 style="margin-top:6px">Analyzing your clip</h2><div class="spin"></div><p style="text-align:center">Your coach is watching…</p>');
+ setTimeout(()=>{const f=feedback(topic,(file?file.size:Math.random()*99)|0);S.fb.unshift(f);save();
+  const now=new Date().toDateString();if(S.last!==now){const y=new Date(Date.now()-864e5).toDateString();S.streak=S.last===y?S.streak+1:1;S.last=now;save()}
+  openSheet('<h2 style="margin-top:6px">Great practice 🎉</h2><p style="margin-bottom:12px">Day logged for <b>'+esc(topic)+'</b>. Here is your coaching.</p>'+fbHtml(f)+'<button class="btn" onclick="closeSheet();render()">Keep going</button>');
+  if(after)after()},1800)}
+function fbHtml(f){return f.ok.map(x=>'<div class="fb ok"><span>✅</span><div><em>What you’re doing right</em>'+x+'</div></div>').join('')+
+ '<div class="fb fix"><span>🎯</span><div><em>One precise fix</em>'+f.fix+'</div></div><div class="fb pro"><span>✨</span><div><em>Pro trick</em>'+f.pro+'</div></div>'}
+function pick(topic,after){
+ const i=document.createElement("input");i.type="file";i.accept="video/*";i.setAttribute("capture","user");
+ i.onchange=()=>{const f=i.files[0];if(!f)return;
+  let pv="";try{pv=URL.createObjectURL(f)}catch(e){}
+  analyze(topic,f,after)};
+ i.click()}
+function checkin(pid){const p=S.paths.find(x=>x.id==pid);
+ openSheet('<h2 style="margin-top:6px">Daily video check-in</h2><p style="margin-bottom:14px">Record or upload a 5-second clip of yourself practicing. Everyone checks in, whatever their learning style.</p><button class="btn" onclick="pick(\''+esc(p.topic).replace(/'/g,"\\'")+'\')">🎥 Record or upload clip</button><div style="height:10px"></div><button class="btn g" onclick="closeSheet()">Maybe later</button>')}
+
+/* ---------- intake ---------- */
+let IN={};
+function intake(topic){IN={topic,style:"Visual",lvl:1,base:0,step:0};step();fitLoad(IN)}
+async function fitLoad(me){
+ try{const sm=await getSample();if(!sm)throw 0;
+  const r=await sm.json(`A learner wants to learn: ${me.topic}\nRate how well each learning style fits THIS topic. Visual = diagrams, formulas, pictures. Auditory = spoken explanations. Reading/Writing = written instructions and breakdowns. Hands On = hands-on drills and physically practicing on camera.\nlevels: for each style one of best, ok or weak (best for at most 2 styles; weak only when the style would honestly be less efficient or confusing for this topic, for example breaking a habit like nail biting is mostly learned through instructions, so Hands On and Visual are weak).\nnotes: for each style rated weak, one friendly sentence (max 30 words, addressed to the learner) saying why it could be less efficient or confusing for this topic and which styles usually work better. Leave out styles that are not weak.\nReply ONLY JSON, using double-quoted keys: {levels:{Visual:string,Auditory:string,"Reading/Writing":string,"Hands On":string},notes:{}}`);
+  me.fit=r&&r.levels?r:null}catch(e){me.fit=null}
+ if(IN===me&&me.step===0)step()}
+function step(){
+ const s=IN.step;let h='<p style="color:var(--ac);font-weight:600">Question '+(s+1)+' of 3</p><h2 style="margin-top:4px">'+esc(cap(IN.topic))+'</h2>';
+ if(s===0){const F=IN.fit,lv=k=>F&&F.levels&&F.levels[k],nt=F&&F.notes&&F.notes[IN.style];
+  h+='<div class="lbl">How do you learn best?</div><div class="fb pro" style="margin-bottom:10px"><span>🧭</span><div><em>Quick heads up</em>Some topics are easier to learn with certain styles. If another style would fit your topic better, we’ll tell you. You can always choose whichever you like.</div></div>'+
+  (F===undefined?'<p style="margin-bottom:8px">Checking which styles suit this topic…</p>':'')+
+  Object.entries(STYLES).map(([k,v])=>{const l=lv(k);return '<div class="opt '+(IN.style===k?"sel":"")+'" onclick="IN.style=\''+k+'\';step()"><span class="e">'+v[0]+'</span><div style="flex:1"><b>'+k+'</b><p>'+v[1]+'</p></div>'+(l==='best'?'<span class="tag" style="background:rgba(47,184,111,.18);color:var(--ok)">Great fit</span>':l==='weak'?'<span class="tag" style="background:rgba(224,138,58,.18);color:var(--warn)">Less ideal</span>':'')+'</div>'}).join('')+
+  (nt&&lv(IN.style)==='weak'?'<div class="fb fix"><span>💡</span><div><em>Heads up on '+esc(IN.style)+'</em>'+esc(nt)+' You can still go with it if you prefer.</div></div>':'')}
+ if(s===1){h+='<div class="lbl">Timeframe and intensity</div><div class="card"><h3 id="lv">'+LEVELS[IN.lvl]+'</h3><p id="lvd">'+["Light daily micro-tasks","A comfortable daily rhythm","More tasks, faster progress","High-volume accelerated days"][IN.lvl]+'</p><input type="range" min="0" max="3" value="'+IN.lvl+'" oninput="IN.lvl=+this.value;$(\'#lv\').textContent=LEVELS[IN.lvl];$(\'#lvd\').textContent=[\'Light daily micro-tasks\',\'A comfortable daily rhythm\',\'More tasks, faster progress\',\'High-volume accelerated days\'][IN.lvl]"></div>'}
+ if(s===2){h+='<div class="lbl">Where are you starting from?</div>'+BASE.map((b,i)=>'<div class="opt '+(IN.base===i?"sel":"")+'" onclick="IN.base='+i+';step()"><span class="e">'+["🌱","📈","🏆"][i]+'</span><b>'+b+'</b></div>').join('')}
+ h+='<div style="height:8px"></div><button class="btn" onclick="next()">'+(s===2?"Build my path ✨":"Continue")+'</button>';
+ openSheet(h)}
+function next(){if(IN.step<2){IN.step++;step();return}
+ openSheet('<h2 style="margin-top:6px">Designing your roadmap</h2><div class="spin"></div><p style="text-align:center">Tailoring phases to your pace…</p>');
+ setTimeout(async()=>{const p=await generate(IN.topic,IN.style,IN.lvl,IN.base);S.paths.unshift(p);S.cur=p.id;save();closeSheet();$("#search")&&($("#search").value="");openPath(p.id)},1500)}
+
+/* ---------- screens ---------- */
+function openPath(id){S.cur=id;go("path")}
+function toggle(pid,pi,ti){const p=S.paths.find(x=>x.id==pid),t=p.phases[pi].tasks[ti];t.done=!t.done;save();
+ const was=p.done;render();
+ if(t.done){if(pct(p)===100&&!p.done){p.done=Date.now();save();toast("🏆 Path mastered! Badge unlocked");setTimeout(()=>go("library"),1200)}else setTimeout(()=>checkin(pid),350)}}
+async function getSample(){try{return window.claude?await claude.use('sample'):null}catch(e){return null}}
+const STY_HINT={Visual:'diagrams, formulas and visual representations',Auditory:'talking it through out loud or listening',
+ 'Reading/Writing':'reading a short guide and writing it up in their own words',"Hands On":'hands-on action drills'};
+async function coach(pid,pi,ti){
+ const p=S.paths.find(x=>x.id==pid),t=p.phases[pi].tasks[ti];
+ if(p.style==='Reading/Writing')return rwCoach(pid,pi,ti);
+ if(p.style==='Hands On')return kinCoach(pid,pi,ti);
+ if(p.style==='Auditory')return audCoach(pid,pi,ti);
+ if(p.style==='Visual')return visCoach(pid,pi,ti);
+ if(t.plan&&t.plan.length){lesson(pid,pi,ti,0);return}
+ openSheet('<h2 style="margin-top:6px">Your AI coach is preparing</h2><div class="spin"></div><p style="text-align:center">Building a lesson for '+esc(t.t)+'…</p>');
+ const sm=await getSample();
+ if(sm){try{
+  const mins=[5,10,20,40][p.lvl];
+  const r=await sm.json(`You are Masterpath, a warm, encouraging expert coach. Coach ONE learner through ONE task today.\nTopic: ${p.topic}\nToday's task: ${t.t}\nLearning style: ${p.style} (${STY_HINT[p.style]})\nStarting point: ${p.base}\nIntensity: ${LEVELS[p.lvl]}, about ${mins} minutes\n\nWrite 4 or 5 coaching steps in order: get ready; one step tailored to their learning style; the real hands-on practice with concrete instructions (what to do, how many reps or minutes, what good looks like); a quick self-review. Be specific to this topic and task, never generic. Second person, friendly, each body at most 3 short sentences. Reply with ONLY JSON: {"steps":[{"h":"short title","b":"text"}]}`);
+  const a=Array.isArray(r)?r:(r&&r.steps);
+  if(Array.isArray(a)&&a.length>=3){t.plan=a.slice(0,6).map(s=>({h:String(s.h||'Step'),b:String(s.b||''),ul:Array.isArray(s.ul)&&s.ul.length?s.ul.map(String):undefined,link:String(s.q||(t.t+' '+p.topic))}));save()}
+ }catch(e){toast(e&&e.code==='not_granted'?'AI access declined – using built-in lesson':'Coach is busy – using built-in lesson')}}
+ else toast('AI coach unavailable here – using built-in lesson');
+ lesson(pid,pi,ti,0)}
+function askBox(pid,pi,ti){return '<div class="card" style="margin:6px 0 12px"><b style="font-size:14px">Ask your coach</b><div class="row" style="margin-top:8px"><input id="q" placeholder="Stuck? Ask anything…" style="flex:1;min-width:0;background:none;border:1px solid var(--bd);border-radius:12px;padding:10px;color:var(--tx);font:15px var(--font);outline:0"><button class="go" id="mic1" style="margin:0" aria-label="Tap to speak" onclick="micAsk('+pid+','+pi+','+ti+')">🎤</button><button class="go" style="margin:0" onclick="ask('+pid+','+pi+','+ti+')">Ask</button></div><p id="ans" style="margin-top:8px;color:var(--tx);white-space:pre-wrap"></p></div>'}
+async function ask(pid,pi,ti){
+ const q=$('#q').value.trim(),a=$('#ans');if(!q)return;
+ const p=S.paths.find(x=>x.id==pid),t=p.phases[pi].tasks[ti];a.textContent='Thinking…';
+ const sm=await getSample();if(!sm){a.textContent='The AI coach needs AI access, which is not available here.';return}
+ try{await sm(`You are Masterpath, a warm, encouraging expert coach. The learner is working on this task.\nTopic: ${p.topic}\nTask: ${t.t}\nLearning style: ${p.style}\nStarting point: ${p.base}\nThe learner asks: ${q}\nAnswer in under 90 words, plain text, concrete and encouraging.`,{cache:false,onText:({text})=>{a.textContent=text}})}
+ catch(e){a.textContent='Could not reach the coach. Try again in a moment.'}}
+async function generate(topic,style,lvl,base){
+ const sm=await getSample(),n=[2,3,4,5][lvl],mins=[5,10,20,40][lvl];
+ if(sm){try{
+  const r=await sm.json(`You are Masterpath, an expert coach who designs learning paths. Create a custom path for this learner.\nTopic: ${topic}\nLearning style: ${style}\nStarting point: ${BASE[base]}\nIntensity: ${LEVELS[lvl]} (about ${mins} minutes per task)\n\nRules:\n- Exactly 3 phases. Each phase title must be specific to this topic and show how the learner progresses from their starting point. Never use generic titles like Foundations, Build skill or Mastery.\n- Each phase has exactly ${n} tasks, in teaching order, each building on the last.\n- Field t is the task title. It must name exactly what the learner will learn or be able to do in that task, in under 9 words. A good example for boxing: The jab: stance, hip turn and snap back. Never use vague titles like Practice basics, Learn the key terms or Final showcase.\n- Field d is one short sentence on the concrete skill or knowledge gained.\n- The path must clearly differ from a path for any other topic and suit the starting point.\nReply with ONLY JSON shaped like this, using double-quoted keys: {phases:[{title:string,tasks:[{t:string,d:string}]}]}`);
+  if(r&&Array.isArray(r.phases)&&r.phases.length>=3&&r.phases.every(x=>x&&Array.isArray(x.tasks)&&x.tasks.length)){
+   return{id:Date.now(),topic:cap(topic),style,lvl,base:BASE[base].toLowerCase(),created:Date.now(),
+    phases:r.phases.slice(0,3).map(x=>({title:String(x.title||'Phase'),tasks:x.tasks.slice(0,n).map(k=>({t:String(k.t||'Task'),d:String(k.d||'')+' · about '+mins+' min',done:false,v:null}))}))}}
+ }catch(e){}}
+ toast('AI unavailable – built a standard path instead');
+ return generateTpl(topic,style,lvl,base)}
+async function rwCoach(pid,pi,ti){
+ const p=S.paths.find(x=>x.id==pid),t=p.phases[pi].tasks[ti];
+ if(t.rw&&t.rw.sections){rwStep(pid,pi,ti,0);return}
+ openSheet('<h2 style="margin-top:6px">Your coach is writing today’s reading</h2><div class="spin"></div><p style="text-align:center">Tailored to '+esc(t.t)+'…</p>');
+ const sm=await getSample();
+ if(sm){try{
+  const w=[70,100,130,160][p.lvl];
+  const r=await sm.json(`You are Masterpath, an expert teacher writing a short reading for ONE learner who learns best by reading and writing.\nPath: ${p.topic}\nToday's task: ${t.t}\nWhat they will gain: ${t.d}\nStarting point: ${p.base}\nIntensity: ${LEVELS[p.lvl]}\n\nWrite 3 reading sections of about ${w} words each. Teach the actual content of this specific task: real explanations, a concrete example, and the why behind it, in plain language suited to their starting point. No filler, no generic advice. Each section has h (clear heading), text (the reading itself) and key (one-sentence key idea). Then write prompt: one instruction asking the learner to explain in their own words what they understood and give an example of their own.\nReply with ONLY JSON, using double-quoted keys: {sections:[{h:string,text:string,key:string}],prompt:string}`);
+  if(r&&Array.isArray(r.sections)&&r.sections.length>=2&&r.prompt){
+   t.rw={sections:r.sections.slice(0,4).map(s=>({h:String(s.h||''),text:String(s.text||''),key:String(s.key||'')})),prompt:String(r.prompt)};save();rwStep(pid,pi,ti,0);return}
+ }catch(e){toast(e&&e.code==='not_granted'?'AI access declined – using built-in lesson':'Coach is busy – using built-in lesson')}}
+ else toast('AI coach unavailable here – using built-in lesson');
+ lesson(pid,pi,ti,0)}
+function wcount(el){const v=el.value.trim();$('#wc').textContent=(v?v.split(/\s+/).length:0)+' words · aim for 40 or more'}
+function rwStep(pid,pi,ti,i){
+ const p=S.paths.find(x=>x.id==pid),t=p.phases[pi].tasks[ti],rw=t.rw,n=rw.sections.length;
+ const dots='<div class="dots">'+Array.from({length:n+1},(_,k)=>'<i class="'+(k<=i?'on':'')+'"></i>').join('')+'</div>';
+ const head='<p style="color:var(--ac);font-weight:600">Reading and writing · '+(i<n?'Reading '+(i+1)+' of '+n:'Your turn to write')+'</p><h2 style="margin-top:4px">'+esc(t.t)+'</h2>'+dots;
+ const back=i?'<div style="height:8px"></div><button class="btn g" onclick="rwStep('+pid+','+pi+','+ti+','+(i-1)+')">'+(i===n?'Re-read':'Back')+'</button>':'';
+ if(i<n){const s=rw.sections[i];
+  openSheet(head+'<div class="card"><h3 style="font-size:18px;margin-bottom:8px">'+esc(s.h)+'</h3>'+s.text.split(/\n+/).map(x=>'<p style="color:var(--tx);font-size:16px;line-height:1.6;margin-bottom:10px">'+esc(x)+'</p>').join('')+'</div><div class="fb pro"><span>💡</span><div><em>Key idea</em>'+esc(s.key)+'</div></div>'+askBox(pid,pi,ti)+'<button class="btn" onclick="rwStep('+pid+','+pi+','+ti+','+(i+1)+')">'+(i===n-1?'Now write what you understood':'Next section')+'</button>'+back);return}
+ openSheet(head+'<div class="cbub"><div class="av">🧭</div><div class="tx"><b>Write it in your own words</b><br>'+esc(rw.prompt)+'</div></div><textarea id="wr" oninput="wcount(this)" placeholder="Write what you understood…" style="width:100%;height:150px;resize:none;background:var(--glass);border:1px solid var(--bd);border-radius:16px;padding:12px;color:var(--tx);font:16px/1.5 var(--font);outline:0">'+esc(t.note||'')+'</textarea><p id="wc" style="margin:6px 0 12px">0 words · aim for 40 or more</p><div id="rwres"></div><button class="btn" id="sub" onclick="rwSubmit('+pid+','+pi+','+ti+')">Get coach feedback</button>'+back);
+ wcount($('#wr'))}
+async function rwSubmit(pid,pi,ti){
+ const p=S.paths.find(x=>x.id==pid),t=p.phases[pi].tasks[ti],txt=$('#wr').value.trim(),words=txt?txt.split(/\s+/).length:0,out=$('#rwres'),btn=$('#sub');
+ if(words<15){toast('Write a few more sentences first');return}
+ t.note=txt;save();btn.disabled=true;btn.textContent='Your coach is reading…';
+ const sm=await getSample();let f=null;
+ if(sm){try{f=await sm.json(`You are Masterpath, a warm, honest expert teacher. A learner studied a reading and then wrote what they understood.\nPath: ${p.topic}\nTask: ${t.t}\nReading they studied:\n${t.rw.sections.map(s=>s.h+': '+s.text).join('\n')}\n\nWriting prompt: ${t.rw.prompt}\n\nBEGIN LEARNER WRITING\n${txt}\nEND LEARNER WRITING\n\nJudge how well they understood the reading. Be specific, kind and accurate. Reply with ONLY JSON, using double-quoted keys: {ok:[1 or 2 specific things they understood correctly],gap:the single most important thing missing or slightly wrong, said kindly with the correct idea,tip:one concrete tip to deepen or apply this}`,{cache:false})}catch(e){}}
+ if(f&&f.ok){const ok=[].concat(f.ok);
+  out.innerHTML=ok.map(x=>'<div class="fb ok"><span>✅</span><div><em>What you understood</em>'+esc(x)+'</div></div>').join('')+(f.gap?'<div class="fb fix"><span>🎯</span><div><em>Fill the gap</em>'+esc(f.gap)+'</div></div>':'')+(f.tip?'<div class="fb pro"><span>✨</span><div><em>Level up</em>'+esc(f.tip)+'</div></div>':'')}
+ else out.innerHTML='<p style="margin-bottom:12px">Feedback is not available right now, but your writing is saved. Nice work.</p>';
+ btn.disabled=false;btn.textContent='Done · Mark complete';btn.onclick=()=>finish(pid,pi,ti)}
+async function kinCoach(pid,pi,ti){
+ const p=S.paths.find(x=>x.id==pid),t=p.phases[pi].tasks[ti];
+ if(t.kin){kinStep(pid,pi,ti,0);return}
+ openSheet('<h2 style="margin-top:6px">Your coach is preparing your task</h2><div class="spin"></div><p style="text-align:center">'+esc(t.t)+'…</p>');
+ const sm=await getSample();
+ if(sm){try{
+  const r=await sm.json(`You are Masterpath, an expert hands-on coach for a learner who learns by doing.\nPath: ${p.topic}\nTask topic: ${t.t}\nWhat they will gain: ${t.d}\nStarting point: ${p.base}\nIntensity: ${LEVELS[p.lvl]}\n\nWrite: brief (2 to 4 short sentences that briefly instruct them on this specific skill and how to do it), cues (3 short things to get right), task (one clear, specific thing to do ONCE by themselves, on camera, in about 15 seconds, saying exactly what to do), success (2 or 3 things a viewer should be able to SEE in the video if they understood).\nReply with ONLY JSON, using double-quoted keys: {brief:string,cues:[string],task:string,success:[string]}`);
+  if(r&&r.brief&&r.task){t.kin={brief:String(r.brief),cues:[].concat(r.cues||[]).map(String),task:String(r.task),success:[].concat(r.success||[]).map(String)};save();kinStep(pid,pi,ti,0);return}
+ }catch(e){}}
+ t.kin={brief:'Today you are learning: '+t.t+'. '+t.d,cues:['Go slowly','Keep it simple','Stay in frame'],task:'Do one clean attempt of '+t.t+' by yourself on camera for about 15 seconds.',success:['Your whole attempt is visible','You complete it once, start to finish']};
+ save();kinStep(pid,pi,ti,0)}
+function kinStep(pid,pi,ti,i){
+ const p=S.paths.find(x=>x.id==pid),t=p.phases[pi].tasks[ti],k=t.kin,li=a=>a.map(c=>'<li>'+esc(c)+'</li>').join('');
+ const head='<p style="color:var(--ac);font-weight:600">Hands-on task · Step '+(i+1)+' of 2</p><h2 style="margin-top:4px">'+esc(t.t)+'</h2><div class="dots"><i class="on"></i><i class="'+(i?'on':'')+'"></i></div>';
+ const a=pid+','+pi+','+ti;
+ if(!i){openSheet(head+'<div class="cbub"><div class="av">🧭</div><div class="tx"><b>Quick lesson</b><br>'+esc(k.brief)+'<ul>'+li(k.cues)+'</ul></div></div>'+askBox(pid,pi,ti)+'<button class="btn" onclick="kinStep('+a+',1)">Got it · Give me my task</button>');return}
+ openSheet(head+'<div class="cbub"><div class="av">🎯</div><div class="tx"><b>Your task</b><br>'+esc(k.task)+'<br><b style="font-size:13px">Your coach will look for:</b><ul>'+li(k.success)+'</ul></div></div><p style="margin-bottom:10px">Do it once, by yourself, and record about 15 seconds. Your coach watches the clip and tells you whether you understood.</p><button class="btn" onclick="kinPick('+a+',true)">🎥 Record 15-second clip</button><div style="height:8px"></div><button class="btn g" onclick="kinPick('+a+',false)">Upload a clip</button><div style="height:8px"></div><button class="btn g" onclick="kinStep('+a+',0)">Back to lesson</button>')}
+function kinPick(pid,pi,ti,cam){const i=document.createElement('input');i.type='file';i.accept='video/*';if(cam)i.setAttribute('capture','user');
+ i.onchange=()=>{const f=i.files[0];if(f)kinAnalyze(pid,pi,ti,f)};i.click()}
+function frames(file){return new Promise((res,rej)=>{
+ const v=document.createElement('video');v.muted=true;v.playsInline=true;v.preload='auto';const u=URL.createObjectURL(file);v.src=u;
+ const bail=setTimeout(()=>rej(new Error('timeout')),20000);v.onerror=()=>rej(new Error('video'));
+ v.onloadedmetadata=async()=>{try{
+  const d=Math.min(v.duration||15,15),out=[],c=document.createElement('canvas'),w=Math.min(512,v.videoWidth||512);
+  c.width=w;c.height=Math.round(w*(v.videoHeight||384)/(v.videoWidth||512));const x=c.getContext('2d');
+  for(const f of [.1,.3,.5,.7,.9]){await new Promise(r=>{v.onseeked=r;v.currentTime=d*f});x.drawImage(v,0,0,c.width,c.height);out.push(await new Promise(r=>c.toBlob(r,'image/jpeg',.7)))}
+  clearTimeout(bail);URL.revokeObjectURL(u);res(out)}catch(e){rej(e)}}})}
+async function kinAnalyze(pid,pi,ti,file){
+ const p=S.paths.find(x=>x.id==pid),t=p.phases[pi].tasks[ti],k=t.kin;
+ openSheet('<h2 style="margin-top:6px">Analyzing your clip</h2><div class="spin"></div><p style="text-align:center">Your coach is watching…</p>');
+ let fr=null,res=null,why='';
+ try{fr=await frames(file)}catch(e){why='video'}
+ const sm=await getSample();
+ if(sm&&fr){try{const lim=await sm.limits();
+  if(lim&&lim.images)res=await sm.json(`You are Masterpath, an expert hands-on coach. The attached images are 5 frames, in time order, from a learner's video of themselves doing a task.\nPath: ${p.topic}\nLesson they were given: ${k.brief}\nTask they were given: ${k.task}\nWhat should be visible if they understood: ${k.success.join('; ')}\n\nJudge ONLY what you can actually see in the frames. Decide whether they understood and carried out the task: verdict is yes, partly or no. If the frames are unclear or the task is not visible, say so honestly and use no. Reply with ONLY JSON, using double-quoted keys: {verdict:string,summary:one warm sentence,right:[1 or 2 specific things you saw them do right],fix:one precise fix,pro:one pro trick}`,{images:fr,cache:false});
+  else why='noimg'}catch(e){why=(e&&e.code)||'err'}}
+ if(!res||!res.verdict){openSheet('<h2 style="margin-top:6px">Couldn’t analyze that clip</h2><p style="margin-bottom:12px">'+(why==='not_granted'?'AI access was declined.':'The clip couldn’t be read here, or the coach is busy.')+' Nothing was judged and your task is not marked complete.</p><button class="btn" onclick="kinStep('+pid+','+pi+','+ti+',1)">Try again</button>');return}
+ const v=String(res.verdict).toLowerCase(),ok=v==='yes'||v==='partly';
+ S.fb.unshift({topic:p.topic+': '+t.t,t:Date.now(),ok:[].concat(res.right||[]).map(x=>esc(x)),fix:esc(res.fix||''),pro:esc(res.pro||'')});
+ const now=new Date().toDateString();if(S.last!==now){const y=new Date(Date.now()-864e5).toDateString();S.streak=S.last===y?S.streak+1:1;S.last=now}
+ if(ok){t.done=true;if(pct(p)===100&&!p.done){p.done=Date.now();toast('🏆 Path mastered! Badge unlocked in Library')}}
+ if(ok)burst();save();render();const H={yes:['🎉','You understood it'],partly:['👍','Almost there – marked complete']}[v]||['🔁','Not quite yet'];
+ openSheet('<h2 style="margin-top:6px">'+H[0]+' '+H[1]+'</h2><p style="margin-bottom:12px">'+esc(res.summary||'')+'</p>'+fbHtml(S.fb[0])+'<button class="btn" onclick="'+(ok?'closeSheet()':'kinStep('+pid+','+pi+','+ti+',1)')+'">'+(ok?'Keep going':'Try again')+'</button>')}
+async function visual(pid,pi,ti,i){
+ const p=S.paths.find(x=>x.id==pid),t=p.phases[pi].tasks[ti],st=lessonSteps(p,t)[i],box=$('#vz');if(!box)return;
+ box.innerHTML='<div class="spin"></div><p style="text-align:center">Drawing your visual…</p>';
+ const sm=await getSample();if(!sm){box.innerHTML='<p style="margin-top:8px">Visuals need AI access, which isn’t available here.</p>';return}
+ try{const r=await sm.json(`You are a visual teacher. Make ONE simple, clean, labeled SVG diagram that visually explains this coaching step.\nPath: ${p.topic}\nTask: ${t.t}\nStep: ${st.h}: ${st.b}\nRules: viewBox="0 0 360 220"; no scripts, no images, no external links; dark-friendly colors (strokes #6f7ce0 or #3cbfa3, text #f5f6fa, no large white fills); short labels (max 3 words) at font-size 13 or larger; show the movement, process or structure with shapes and arrows.\nReply ONLY JSON using double-quoted keys: {svg:string,caption:one sentence,watch:[3 short bullets on what to look for]}`,{cache:false});
+  let sv=String(r.svg||'');if(!/^\s*<svg/i.test(sv))throw 0;
+  sv=sv.replace(/<script[\s\S]*?<\/script>/gi,'').replace(/<foreignObject[\s\S]*?<\/foreignObject>/gi,'');
+  if(!/xmlns=/.test(sv))sv=sv.replace(/<svg/i,'<svg xmlns="http://www.w3.org/2000/svg"');
+  box.innerHTML='<div class="card" style="margin-top:10px;padding:10px"><img alt="'+esc(st.h)+'" style="width:100%;border-radius:12px;background:#0d0f18" src="data:image/svg+xml;charset=utf-8,'+encodeURIComponent(sv)+'"><p style="margin-top:8px;color:var(--tx)">'+esc(r.caption||'')+'</p><b style="font-size:13px">Watch for</b><ul style="margin:4px 0 0;padding-left:18px;color:var(--mut);font-size:13.5px;line-height:1.5">'+[].concat(r.watch||[]).map(w=>'<li>'+esc(w)+'</li>').join('')+'</ul></div>'
+ }catch(e){box.innerHTML='<p style="margin-top:8px">Couldn’t draw that one. Tap again to retry.</p>'}}
+const AUD={rate:.85,txt:'',playing:false,paused:false};
+const BADV=/compact|espeak|zarvox|albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|good news|hysterical|junior|kathy|organ|princess|ralph|trinoids|whisper|wobble|fred|agnes/i;
+function voiceScore(x){return(/natural|neural|premium|enhanced|siri|online/i.test(x.name)?40:0)+(/google|microsoft/i.test(x.name)?15:0)+(/samantha|ava|zoe|allison|susan|aria|jenny|sonia|serena|karen|daniel|libby|ryan/i.test(x.name)?10:0)+(/en[-_]US/i.test(x.lang)?4:/en[-_]GB/i.test(x.lang)?2:0)}
+function enVoices(){const v=(window.speechSynthesis&&speechSynthesis.getVoices())||[];return v.filter(x=>/^en/i.test(x.lang)&&!BADV.test(x.name)).sort((a,b)=>voiceScore(b)-voiceScore(a))}
+function pickVoice(){const l=enVoices();let sv='';try{sv=localStorage.getItem('mpv')||''}catch(e){}return l.find(x=>x.name===sv)||l[0]||null}
+let SPK=0;
+function say(txt){try{speechSynthesis.cancel();const id=++SPK,parts=(txt.match(/[^.!?]+[.!?]*/g)||[txt]).map(x=>x.trim()).filter(Boolean),v=pickVoice();AUD.playing=true;AUD.paused=false;
+ const lab=t=>{const b=$('#pp');if(b)b.textContent=t};
+ const next=k=>{if(id!==SPK)return;if(k>=parts.length){AUD.playing=false;lab('▶ Play');return}
+  const u=new SpeechSynthesisUtterance(parts[k]);u.rate=AUD.rate;u.pitch=1;if(v){u.voice=v;u.lang=v.lang}else u.lang='en-US';
+  u.onend=()=>setTimeout(()=>next(k+1),/[?!]$/.test(parts[k])?340:260);speechSynthesis.speak(u)};
+ next(0);lab('⏸ Pause')}catch(e){toast('Voice isn’t supported in this browser')}}
+function audPP(){try{const b=$('#pp');if(AUD.paused){speechSynthesis.resume();AUD.paused=false;b.textContent='⏸ Pause'}else if(AUD.playing){speechSynthesis.pause();AUD.paused=true;b.textContent='▶ Resume'}else say(AUD.txt)}catch(e){}}
+function setVoice(n,pid,pi,ti,i){try{localStorage.setItem('mpv',n)}catch(e){}audStep(pid,pi,ti,i)}
+function audRate(r,pid,pi,ti,i){AUD.rate=r;audStep(pid,pi,ti,i)}
+async function audCoach(pid,pi,ti){
+ const p=S.paths.find(x=>x.id==pid),t=p.phases[pi].tasks[ti];
+ if(t.aud){audStep(pid,pi,ti,0);return}
+ openSheet('<h2 style="margin-top:6px">Your coach is writing your audio lesson</h2><div class="spin"></div><p style="text-align:center">'+esc(t.t)+'…</p>');
+ const sm=await getSample();
+ if(sm){try{
+  const r=await sm.json(`You are a friendly voice coach talking out loud to a learner who learns by listening. Explain like you are talking to a curious 10 year old: very simple words, short sentences (under 15 words each), a fun everyday comparison, and explain any big word right away. Never use jargon without explaining it.\nPath: ${p.topic}\nTask: ${t.t}\nWhat they will gain: ${t.d}\nStarting point: ${p.base}\n\nWrite 4 spoken parts: 1 get ready (what we will learn and why it is cool), 2 the main idea with a comparison, 3 how to do it, one small step at a time, 4 your turn (tell them exactly what to try, and to say out loud what they learned). Each part has h (short title) and say (the exact words to speak, 45 to 80 words, warm and calm, plain text only, no lists, symbols or emojis; sound like a warm friend chatting: use contractions like it's and you'll, vary sentence length, use commas for natural pauses).\nReply ONLY JSON, using double-quoted keys: {steps:[{h:string,say:string}]}`);
+  if(r&&Array.isArray(r.steps)&&r.steps.length>=3){t.aud=r.steps.slice(0,5).map(x=>({h:String(x.h||'Listen'),say:String(x.say||'')}));save();audStep(pid,pi,ti,0);return}
+ }catch(e){}}
+ t.aud=[{h:'Get ready',say:'Today we are learning about '+t.t+'. Take a deep breath. We will go nice and slow.'},{h:'Your turn',say:'Now try it yourself for a few minutes. Then say out loud what you learned, like you are teaching a friend.'}];
+ save();audStep(pid,pi,ti,0)}
+function audStep(pid,pi,ti,i){
+ const p=S.paths.find(x=>x.id==pid),t=p.phases[pi].tasks[ti],st=t.aud,n=st.length,s=st[i],last=i===n-1,a=pid+','+pi+','+ti;
+ AUD.txt=s.say;const vl=enVoices().slice(0,12),cv=pickVoice();
+ const rb=(l,r)=>'<button class="go" style="margin:0;'+(AUD.rate===r?'background:var(--ac);color:#fff':'')+'" onclick="audRate('+r+','+a+','+i+')">'+l+'</button>';
+ openSheet('<p style="color:var(--ac);font-weight:600">Audio lesson · Part '+(i+1)+' of '+n+'</p><h2 style="margin-top:4px">'+esc(t.t)+'</h2><div class="dots">'+st.map((_,k)=>'<i class="'+(k<=i?'on':'')+'"></i>').join('')+'</div>'+
+  '<div class="cbub"><div class="av">🎧</div><div class="tx"><b>'+esc(s.h)+'</b><br><span style="color:var(--mut);font-size:14px">'+esc(s.say)+'</span></div></div>'+
+  '<div class="row" style="margin-bottom:10px"><button class="btn" id="pp" style="flex:2" onclick="audPP()">⏸ Pause</button><button class="btn g" style="flex:1" onclick="say(AUD.txt)">↻ Replay</button></div>'+
+  '<div class="row" style="margin-bottom:12px"><span style="color:var(--mut);font-size:13px">Speed</span>'+rb('Slower',.75)+rb('Slow',.85)+rb('Normal',1)+'</div>'+(vl.length>1?'<div class="row" style="margin-bottom:12px"><span style="color:var(--mut);font-size:13px">Voice</span><select style="flex:1;min-width:0;padding:9px;border-radius:12px;background:var(--glass);color:var(--tx);border:1px solid var(--bd);font:14px var(--font)" onchange="setVoice(this.value,'+a+','+i+')">'+vl.map(x=>'<option '+(cv&&x.name===cv.name?'selected':'')+'>'+esc(x.name)+'</option>').join('')+'</select></div>':'')+
+  '<button class="btn" onclick="'+(last?'finish('+a+')':'audStep('+a+','+(i+1)+')')+'">'+(last?'I did it · Mark complete':'Next part')+'</button>'+(i?'<div style="height:8px"></div><button class="btn g" onclick="audStep('+a+','+(i-1)+')">Back</button>':''));
+ say(s.say)}
+function cleanSvg(x){x=String(x||'');if(!/^\s*<svg/i.test(x))return '';x=x.replace(/<script[\s\S]*?<\/script>/gi,'').replace(/<foreignObject[\s\S]*?<\/foreignObject>/gi,'');if(!/xmlns=/.test(x))x=x.replace(/<svg/i,'<svg xmlns="http://www.w3.org/2000/svg"');return x}
+async function visCoach(pid,pi,ti){
+ const p=S.paths.find(x=>x.id==pid),t=p.phases[pi].tasks[ti];
+ if(t.vis){visStep(pid,pi,ti,0);return}
+ openSheet('<h2 style="margin-top:6px">Your coach is building your visual lesson</h2><div class="spin"></div><p style="text-align:center">'+esc(t.t)+'…</p>');
+ const sm=await getSample();
+ if(sm){try{
+  const r=await sm.json(`You are Masterpath, a visual teaching coach. Teach ONE learner who learns through visual representations. For each step, first EXPLAIN in simple words, then name the visual that will be drawn.\nPath: ${p.topic}\nTask: ${t.t}\nWhat they will gain: ${t.d}\nStarting point: ${p.base}\nIntensity: ${LEVELS[p.lvl]}\n\nWrite 3 or 4 steps: the core idea; the method as an easy-to-remember formula, rule or diagram; a worked example; a try-it-yourself cheat sheet. Each step has h (short title), b (explanation, 2 or 3 short sentences, plain words, specific to this task) and viz (one sentence describing the single best visual to draw for that step, such as a formula card with a color-coded worked example, a labeled diagram, a step-by-step flow, a comparison table or a chart; for math prefer an easy-to-remember formula or equation).\nReply with ONLY JSON, using double-quoted keys: {steps:[{h:string,b:string,viz:string}]}`);
+  if(r&&Array.isArray(r.steps)&&r.steps.length>=3){t.vis=r.steps.slice(0,4).map(x=>({h:String(x.h||'Step'),b:String(x.b||''),viz_:String(x.viz||x.h||'')}));save();visStep(pid,pi,ti,0);return}
+ }catch(e){}}
+ t.vis=lessonSteps(p,t).slice(0,3).map(x=>({h:x.h,b:x.b,viz_:t.t}));save();visStep(pid,pi,ti,0)}
+function visStep(pid,pi,ti,i){
+ const p=S.paths.find(x=>x.id==pid),t=p.phases[pi].tasks[ti],st=t.vis,n=st.length,s=st[i],last=i===n-1,a=pid+','+pi+','+ti;
+ openSheet('<p style="color:var(--ac);font-weight:600">Visual lesson · Step '+(i+1)+' of '+n+'</p><h2 style="margin-top:4px">'+esc(t.t)+'</h2><div class="dots">'+st.map((_,k)=>'<i class="'+(k<=i?'on':'')+'"></i>').join('')+'</div>'+
+  '<div class="cbub"><div class="av">🧭</div><div class="tx"><b>'+esc(s.h)+'</b><br>'+esc(s.b)+'</div></div><div id="vz" data-k="'+i+'"></div>'+askBox(pid,pi,ti)+
+  '<button class="btn" onclick="'+(last?'finish('+a+')':'visStep('+a+','+(i+1)+')')+'">'+(last?'I did it · Mark complete':'Next step')+'</button>'+(i?'<div style="height:8px"></div><button class="btn g" onclick="visStep('+a+','+(i-1)+')">Back</button>':''));
+ drawViz(pid,pi,ti,i)}
+async function drawViz(pid,pi,ti,i){
+ const p=S.paths.find(x=>x.id==pid),t=p.phases[pi].tasks[ti],st=t.vis[i];
+ const box=()=>{const b=$('#vz');return b&&b.dataset.k==i?b:null};
+ const show=v=>{const b=box();if(b)b.innerHTML='<div class="card" style="margin-top:12px;padding:10px"><img alt="Visual explanation" style="width:100%;border-radius:12px;background:#0d0f18" src="data:image/svg+xml;charset=utf-8,'+encodeURIComponent(v.svg)+'"><p style="margin-top:8px;color:var(--tx)">'+esc(v.caption)+'</p>'+(v.remember?'<div class="fb pro" style="margin:8px 0 0"><span>💡</span><div><em>Remember this</em>'+esc(v.remember)+'</div></div>':'')+'</div>'};
+ if(st.viz){show(st.viz);return}
+ if(box())box().innerHTML='<div class="spin"></div><p style="text-align:center">Drawing your visual…</p>';
+ const sm=await getSample();
+ if(!sm){if(box())box().innerHTML='<p>Visuals need AI access, which isn’t available here.</p>';return}
+ try{const r=await sm.json(`You are a visual teacher. Draw ONE clear SVG that visually teaches this step to a learner who learns through pictures.\nPath: ${p.topic}\nTask: ${t.t}\nStep: ${st.h}: ${st.b}\nVisual to draw: ${st.viz_||st.h}\nRules: viewBox="0 0 360 240"; no scripts, images or external links; dark-friendly colors (shapes and strokes in #6f7ce0, #3cbfa3, #d9ac5a or #e08a3a, text in #f5f6fa, no large white fills); font-family="-apple-system,Helvetica,Arial,sans-serif"; labels at font-size 14 or larger and key formulas at 22 or larger; color-code matching parts; for math or logic prefer an easy-to-remember formula or equation with a short worked example; for processes use numbered boxes with arrows.\nReply ONLY JSON using double-quoted keys: {svg:string,caption:one sentence explaining the visual,remember:one short memory trick}`,{cache:false});
+  const sv=cleanSvg(r.svg);if(!sv)throw 0;st.viz={svg:sv,caption:String(r.caption||''),remember:String(r.remember||'')};save();show(st.viz)
+ }catch(e){if(box())box().innerHTML='<p style="margin-top:8px">Couldn’t draw that one.</p><button class="go" onclick="drawViz('+pid+','+pi+','+ti+','+i+')">Try again</button>'}}
+function lessonSteps(p,t){
+ if(t.plan&&t.plan.length)return t.plan;
+ const m=[5,10,20,40][p.lvl]+" minutes",T=t.t;
+ const mid={Visual:{h:"Watch the clip",b:"Open one short video on this and watch for:",ul:t.v?t.v.w:[],link:t.v?t.v.q:T},
+  Auditory:{h:"Talk it through",b:"Say this out loud, like you are explaining it to a friend: what it means, the very first move, and the biggest mistake to avoid. A voice note works too."},
+  "Reading/Writing":{h:"Read, then write",b:"Read one beginner guide on this. Then write 3 sentences in your own words: what it is, how it is done, and what to avoid."},
+  "Hands On":{h:"Do the drill",b:"Do 3 slow practice reps. Slow is smooth, and smooth becomes fast. Stop and reset between reps."}}[p.style];
+ return[
+  {h:"Get ready",b:"Today’s goal: "+T+". Set aside "+m+", clear a small space, and aim for progress, not perfection. You are starting as a "+p.base+", so that is exactly where we begin."},
+  mid,
+  {h:"Try it for real",b:"Now do it yourself for about "+m+". Start small and keep it easy. Coach tip: if you feel stuck, cut the task in half and finish that half."},
+  {h:"Quick review",b:"Notice one thing that went well and one thing to improve. Next you will record a 5-second clip so I can coach what I see."}]}
+function lesson(pid,pi,ti,i){
+ i=i||0;const p=S.paths.find(x=>x.id==pid),t=p.phases[pi].tasks[ti],st=lessonSteps(p,t),s=st[i],last=i===st.length-1;
+ openSheet('<p style="color:var(--ac);font-weight:600">Coached task · Step '+(i+1)+' of '+st.length+'</p><h2 style="margin-top:4px">'+esc(t.t)+'</h2><div class="dots">'+st.map((_,k)=>'<i class="'+(k<=i?"on":"")+'"></i>').join('')+'</div>'+
+  '<div class="cbub"><div class="av">🧭</div><div class="tx"><b>'+s.h+'</b><br>'+esc(s.b)+(s.ul?'<ul>'+s.ul.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul><button class="go" onclick="visual('+pid+','+pi+','+ti+','+i+')">🖼 Show me visually</button><div id="vz"></div>':'')+'</div></div>'+
+  askBox(pid,pi,ti)+'<button class="btn" onclick="'+(last?'finish('+pid+','+pi+','+ti+')':'lesson('+pid+','+pi+','+ti+','+(i+1)+')')+'">'+(last?'I did it · Mark complete':'Next step')+'</button>'+
+  (i?'<div style="height:8px"></div><button class="btn g" onclick="lesson('+pid+','+pi+','+ti+','+(i-1)+')">Back</button>':''))}
+function finish(pid,pi,ti){
+ const p=S.paths.find(x=>x.id==pid);p.phases[pi].tasks[ti].done=true;save();
+ if(pct(p)===100&&!p.done){p.done=Date.now();save();toast("🏆 Path mastered! Badge unlocked in Library")}
+ render();closeSheet();burst()}
+const R={
+ home(){const ex=["Quantum computing","Boxing footwork","Sourdough bread","Financial accounting"];
+  return '<div class="row"><p style="font-weight:600;color:var(--ac)">Masterpath</p><span class="sp"></span>'+(S.streak?'<span class="tag">🔥 '+S.streak+'-day streak</span>':'')+'</div><h1>What do you want to master today?</h1><p>Your personal coach for anything on Earth.</p>'+
+  '<div class="search"><span style="font-size:22px">🔎</span><div style="position:relative;flex:1"><div class="ph"><span>Master</span><span class="phw" id="phw">'+PHR[PHI]+'</span></div><textarea id="search" oninput="this.parentNode.classList.toggle(\'has\',this.value.length>0)" placeholder="" style="width:100%"></textarea></div></div>'+
+  '<button class="btn" onclick="const v=$(\'#search\').value.trim();v?intake(v):toast(\'Type something to learn first\')">Start learning</button>'+
+  '<div class="lbl">Try one</div><div class="chips">'+ex.map(e=>'<span class="chip" onclick="intake(\''+e+'\')">'+e+'</span>').join('')+'</div>'+
+  contCard()+'<h2>Active paths</h2>'+(S.paths.filter(p=>!p.done).map(p=>{const v=pct(p);return '<div class="card" onclick="openPath('+p.id+')" style="cursor:pointer"><div class="row"><h3 class="sp">'+esc(p.topic)+'</h3><span class="tag">'+p.style+'</span></div><div class="bar"><i style="width:'+v+'%"></i></div><p>'+v+'% to Mastery · '+LEVELS[p.lvl]+'</p></div>'}).join('')||'<div class="card"><p>No active paths yet. Search for anything above and your first roadmap appears in seconds.</p></div>')},
+ path(){const p=S.paths.find(x=>x.id==S.cur);if(!p)return '<p>Pick a path from Home.</p>';const v=pct(p);
+  return '<button class="back" onclick="go(\'home\')">‹ Home</button><h1>'+esc(p.topic)+'</h1><p>'+p.style+' · '+LEVELS[p.lvl]+' · '+cap(p.base)+'</p>'+
+  '<div class="card" style="margin-top:14px"><div class="row"><h3 class="sp">Progress</h3><b>'+v+'% to Mastery</b></div><div class="bar"><i style="width:'+v+'%"></i></div></div>'+
+  p.phases.map((ph,pi)=>'<div class="phase card"><h3>'+ph.title+'</h3>'+ph.tasks.map((t,ti)=>'<div class="task '+(t.done?"done":"")+'"><button class="ck" onclick="coach('+p.id+','+pi+','+ti+')">'+(t.done?"✓":"")+'</button><div class="sp"><h3>'+esc(t.t)+'</h3><p>'+esc(t.d)+'</p>'+(t.done?'':'<button class="go" onclick="coach('+p.id+','+pi+','+ti+')">Coach me through it</button>')+
+   ''+'</div></div>').join('')+'</div>').join('')+
+  ''},
+ library(){const won=S.paths.filter(p=>p.done),act=S.paths.filter(p=>!p.done);
+  return '<h1>The Full House</h1><p>Finish a path to turn it into a glowing badge.</p><h2>Mastered ('+won.length+')</h2><div class="grid">'+
+  (won.map(p=>'<div class="badge won" onclick="share('+p.id+')"><button class="x" aria-label="Delete topic" onclick="event.stopPropagation();delAsk('+p.id+')">✕</button><span class="ic">🏅</span><b>'+esc(p.topic)+'</b><p>Tap to share</p></div>').join('')||'<div class="card" style="grid-column:1/-1"><p>Your first badge is waiting. Complete every task in a path to earn it.</p></div>')+
+  '</div><h2>In progress</h2><div class="grid">'+act.map(p=>'<div class="badge lock" onclick="openPath('+p.id+')"><button class="x" aria-label="Delete topic" onclick="event.stopPropagation();delAsk('+p.id+')">✕</button><span class="ic">🔒</span><b>'+esc(p.topic)+'</b><p>'+pct(p)+'%</p></div>').join('')+'</div>'},
+ coach(){return '<h1>AI Video Coach</h1><p>Feedback from your Hands On tasks lands here: what you did right, one fix, one pro trick, and whether you understood.</p><div style="height:14px"></div>'+
+  '<h2>Past feedback</h2>'+
+  (S.fb.map(f=>'<div class="card"><h3 style="margin-bottom:10px">'+esc(f.topic)+' · '+new Date(f.t).toLocaleDateString()+'</h3>'+fbHtml(f)+'</div>').join('')||'<div class="card"><p>No check-ins yet. Your first clip shows up here.</p></div>')},
+ profile(){
+ const won=S.paths.filter(p=>p.done).length,sub=S.sub==='canceled';
+ return '<div style="min-height:100%;display:flex;flex-direction:column"><div><h1>Profile</h1><p>'+(S.user?esc(S.user.name)+' · '+esc(S.user.email):'Your learning at a glance.')+'</p><div class="grid" style="margin-top:14px"><div class="card stat"><b>'+S.streak+'🔥</b><p>Day streak</p></div><div class="card stat"><b>'+won+'</b><p>Badges</p></div></div></div>'+
+  '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:14px;padding:18px 0">'+
+  '<a class="act" href="mailto:ochoslim8@gmail.com?subject=Masterpath%20support" target="_blank" rel="noopener"><span class="ai">💬</span><span class="at"><b>Contact customer service</b><small>Email us and we’ll help</small></span><span class="ch">›</span></a>'+
+  (sub?'<div class="act dng off"><span class="ai">✓</span><span class="at"><b>Subscription canceled</b><small>Your cancellation was requested</small></span></div>':'<button class="act dng" onclick="cancelAsk()"><span class="ai">✕</span><span class="at"><b>Cancel subscription</b><small>'+(S.sub==='active'?'Subscribed · $1.25/month':S.trial?'Free trial ends '+fmtD(S.trial.end):'Stop future payments')+'</small></span><span class="ch">›</span></button>')+
+  '</div><button class="btn g" onclick="outAsk()">Sign out</button></div>'}
+};
+function delAsk(id){const p=S.paths.find(x=>x.id==id);if(!p)return;openSheet('<h2 style="margin-top:6px">Delete “'+esc(p.topic)+'”?</h2><p style="margin-bottom:14px">This removes the topic from your library, along with its progress and badge. This can’t be undone.</p><button class="btn" style="background:#ff453a" onclick="delGo('+id+')">Delete topic</button><div style="height:8px"></div><button class="btn g" onclick="closeSheet()">Keep it</button>')}
+function delGo(id){S.paths=S.paths.filter(x=>x.id!=id);if(S.cur==id)S.cur=null;save();closeSheet();render();toast('Topic deleted')}
+function share(id){const p=S.paths.find(x=>x.id==id),t="I just mastered "+p.topic+" on Masterpath 🏅";
+ if(navigator.share)navigator.share({title:"Masterpath badge",text:t}).catch(()=>{});
+ else{try{navigator.clipboard.writeText(t);toast("Badge text copied")}catch(e){toast(t)}}}
+function render(){
+ const nb=([k,l])=>'<button class="'+(S.tab===k||(S.tab==="path"&&k==="home")?"on":"")+'" onclick="go(\''+k+'\')"><svg viewBox="0 0 24 24">'+IC[k]+'</svg>'+l+'</button>';
+ $("#nav").innerHTML=nb(TABS[0])+nb(TABS[1])+'<button class="scanbtn" aria-label="Scan anything" onclick="go(\'scan\')"><svg viewBox="0 0 24 24">'+IC.scan+'</svg></button>'+nb(TABS[2])+nb(TABS[3]);
+ if(S.tab!=="home"||!$("#search")||document.activeElement!==$("#search"))$("#"+S.tab).innerHTML=R[S.tab]()}
+IC.scan='<path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3.2"/>';
+/* ---------- voice: tap-to-speak + spoken replies ---------- */
+let MIC=null;
+function listen(onText,onState){
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SR){toast('Voice input isn’t supported in this browser');return null}
+ const r=new SR();r.lang='en-US';r.interimResults=true;r.continuous=false;let fin='';
+ r.onresult=e=>{let t='';for(const x of e.results)t+=x[0].transcript;fin=t;onText(t,false)};
+ r.onend=()=>{onState(false);if(fin)onText(fin,true)};
+ r.onerror=e=>{onState(false);toast(e.error==='not-allowed'?'Microphone access was blocked':'Couldn’t hear that, try again')};
+ try{SPK++;speechSynthesis.cancel();r.start();onState(true)}catch(e){return null}return r}
+function micAsk(pid,pi,ti){
+ if(MIC){try{MIC.stop()}catch(e){}return}
+ const b=$('#mic1');
+ MIC=listen((t,f)=>{const q=$('#q');if(q)q.value=t;if(f)ask(pid,pi,ti).then(()=>{const a=$('#ans');if(a&&a.textContent&&!/^Thinking/.test(a.textContent))say(a.textContent)})},on=>{if(b)b.classList.toggle('live',on);if(!on)MIC=null})}
+function stopSay(){try{SPK++;speechSynthesis.cancel()}catch(e){}}
+/* ---------- universal camera scanner ---------- */
+const SC={style:null,img:null,blob:null,q:'',busy:false,res:null,err:''};
+const scStyle=()=>SC.style||S.style||'Visual';
+function setSStyle(k){SC.style=k;S.style=k;save();render()}
+function imgPrep(file){return new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,1280/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);const url=c.toDataURL('image/jpeg',.8);c.toBlob(b=>res({url,blob:b}),'image/jpeg',.8)};im.onerror=rej;im.src=fr.result};fr.onerror=rej;fr.readAsDataURL(file)})}
+function scPick(cam){const i=document.createElement('input');i.type='file';i.accept='image/*';if(cam)i.setAttribute('capture','environment');
+ i.onchange=async()=>{const f=i.files[0];if(!f)return;try{const r=await imgPrep(f);SC.img=r.url;SC.blob=r.blob;SC.res=null;SC.err='';render();scSolve()}catch(e){toast('Couldn’t read that photo')}};i.click()}
+function scClear(){stopSay();SC.img=SC.blob=null;SC.q='';SC.res=null;SC.err='';render()}
+function scVoiceQ(){if(MIC){try{MIC.stop()}catch(e){}return}const b=$('#qmic');MIC=listen((t,f)=>{SC.q=t;const i=$('#sc0');if(i)i.value=t},on=>{if(b)b.classList.toggle('live',on);if(!on)MIC=null})}
+async function scSolve(){
+ if(!SC.blob&&!SC.q.trim()){toast('Snap a photo or ask a question first');return}
+ SC.busy=true;SC.err='';render();const st=scStyle();
+ try{const sm=await getSample();if(!sm)throw 0;const o={cache:false};
+  if(SC.blob){const lim=await sm.limits();if(!(lim&&lim.images))throw 1;o.images=[SC.blob]}
+  const r=await sm.json(`You are Masterpath, a universal expert tutor and problem solver. The learner may share a photo of ANYTHING (a math equation, machinery, an error log, code, sports form, a real-world object, a textbook page) and/or a question. Work from what you can actually see and read, and state any assumption if something is unclear.\nLearner's question: ${SC.q.trim()||'(none: solve or explain what the image shows)'}\nLearning style: ${st}\n\nFirst give the direct, complete answer or solution, immediately usable (for code, the fix; for equipment, the likely cause and fix; for sports form, the key corrections). Then give a step-by-step walkthrough tailored to the style. Visual: short steps plus ONE clean SVG diagram of the solution (viewBox 0 0 360 240, shapes in #6f7ce0 #3cbfa3 #d9ac5a, text #f5f6fa at size 14 or larger, no scripts or images). "Hands On": hands-on action steps to physically do or try. Auditory: warm conversational steps written as you would say them out loud to a 10 year old. Reading/Writing: detailed steps with the why behind each and key terms. If the subject is dangerous (electrical, gas, chemicals, medical), still help, and add a short safety note on when to call a professional; otherwise note is an empty string.\nReply ONLY JSON, using double-quoted keys: {title:string,answer:string,steps:[{h:string,b:string}],svg:string (Visual only, else empty),note:string}`,o);
+  if(!r||!r.answer)throw 2;
+  SC.res={title:String(r.title||'Solution'),answer:String(r.answer),steps:[].concat(r.steps||[]).map(x=>({h:String(x.h||''),b:String(x.b||'')})),svg:st==='Visual'?cleanSvg(r.svg):'',note:String(r.note||''),style:st}
+ }catch(e){SC.err='I couldn’t solve that right now. Check AI access and try again.'}
+ SC.busy=false;render()}
+function readSol(){const r=SC.res;say(r.title+'. '+r.answer+'. '+r.steps.map((x,i)=>'Step '+(i+1)+'. '+x.h+'. '+x.b).join(' '))}
+async function scAsk(q,sp){
+ const a=$('#sans');if(!a||!q.trim())return;a.textContent='Thinking…';
+ const sm=await getSample();if(!sm){a.textContent='AI access isn’t available here.';return}
+ try{await sm(`You are Masterpath, a warm expert tutor. Earlier you solved this for the learner.\nTitle: ${SC.res.title}\nAnswer: ${SC.res.answer}\nSteps: ${SC.res.steps.map(x=>x.h+': '+x.b).join(' | ')}\nLearning style: ${SC.res.style}\nThe learner now asks: ${q}\nAnswer in under 100 words, plain text, conversational.`,{cache:false,onText:({text})=>{a.textContent=text}});if(sp)say(a.textContent)}
+ catch(e){a.textContent='Could not reach the tutor. Try again.'}}
+function scAskBtn(){scAsk($('#sq').value,false)}
+function scMic(){if(MIC){try{MIC.stop()}catch(e){}return}const b=$('#smic');MIC=listen((t,f)=>{const i=$('#sq');if(i)i.value=t;if(f)scAsk(t,true)},on=>{if(b)b.classList.toggle('live',on);if(!on)MIC=null})}
+R.scan=function(){
+ const st=scStyle(),I=p=>'<svg class="ic" viewBox="0 0 24 24">'+p+'</svg>';
+ const SI={Visual:'<path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="2.8"/>',Auditory:'<path d="M4 14v-4a8 8 0 0 1 16 0v4"/><rect x="3" y="13" width="4" height="7" rx="1.5"/><rect x="17" y="13" width="4" height="7" rx="1.5"/>',"Reading/Writing":'<path d="M5 4h10l4 4v12H5z"/><path d="M9 12h6M9 16h6"/>',"Hands On":'<path d="M7 12V7a1.5 1.5 0 0 1 3 0v5m0-6V5a1.5 1.5 0 0 1 3 0v6m0-4a1.5 1.5 0 0 1 3 0v8c0 3-2 5-5 5s-4-1.5-5-3l-2-3a1.4 1.4 0 0 1 2.2-1.7L7 14"/>'};
+ const ARROW=I('<path d="M12 19V5M6 11l6-6 6 6"/>'),MIC=I('<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>');
+ const frame=(inner,busy)=>'<div class="vf2'+(busy?' busy':'')+'" '+(busy?'':'onclick="scPick(true)" role="button" aria-label="Open camera"')+'><svg class="grid" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M33.3 0V100M66.6 0V100M0 33.3H100M0 66.6H100"/></svg><i class="c tl"></i><i class="c tr"></i><i class="c bl"></i><i class="c br"></i><i class="sweep"></i><div class="vf-mid">'+inner+'</div></div>';
+ const head='<span class="eyebrow">Scanner</span><h1 style="margin-top:6px">Scan anything</h1><div class="segc" role="tablist" aria-label="Walkthrough style">'+['Visual','Auditory','Reading/Writing','Hands On'].map(k=>'<button class="'+(st===k?'on':'')+'" onclick="setSStyle(\''+k+'\')" aria-label="'+k+'">'+I(SI[k])+'<span>'+k+'</span></button>').join('')+'</div>';
+ if(SC.busy)return head+frame((SC.img?'<img alt="Your photo" src="'+SC.img+'">':'')+'<div class="vf-hint" style="position:absolute;bottom:26px"><span>Reading and solving…</span></div>',true);
+ if(!SC.res){
+  return head+frame(SC.img?'<img alt="Your photo" src="'+SC.img+'">':'<div class="vf-hint"><b>Tap to scan</b><span>Math · Code · Error logs · Machines<br>Sports form · Textbook pages</span></div>')+
+   (SC.err?'<p style="margin:12px 4px 0;color:var(--warn)">'+esc(SC.err)+'</p>':'')+
+   '<div class="qrow"><input id="sc0" class="sinp" placeholder="Add a question (optional)" value="'+esc(SC.q)+'" oninput="SC.q=this.value" onkeydown="if(event.key===\'Enter\')scSolve()"><button class="qgo" aria-label="Ask" onclick="scSolve()">'+ARROW+'</button></div>'+
+   '<div class="dock"><button class="dbtn" onclick="scPick(false)" aria-label="Upload a photo">'+I('<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-8 8"/>')+'<span>Photos</span></button>'+
+   '<button class="shutter" onclick="scPick(true)" aria-label="Take a photo"><i></i></button>'+
+   '<button class="dbtn" id="qmic" onclick="scVoiceQ()" aria-label="Ask by voice">'+MIC+'<span>Voice</span></button></div>'}
+ const r=SC.res;
+ return '<div class="res-top"><button class="back" style="margin:0" onclick="scClear()">‹ New scan</button>'+(SC.img?'<img class="thumb" alt="Your photo" src="'+SC.img+'">':'')+'</div>'+
+  '<div class="ans2"><span class="eyebrow" style="color:var(--ac2)">Answer</span><h2>'+esc(r.title)+'</h2><div class="ans-t">'+esc(r.answer)+'</div></div>'+
+  (r.note?'<div class="fb fix" style="margin-top:10px"><span>⚠️</span><div><em>Safety note</em>'+esc(r.note)+'</div></div>':'')+
+  (r.style==='Auditory'?'<button class="listen" onclick="readSol()">'+I('<path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 0 1 0 6"/>')+'Listen</button><button class="listen" onclick="stopSay()">Stop</button>':'')+
+  '<span class="eyebrow" style="display:block;margin:26px 0 14px">Walkthrough · '+esc(r.style)+'</span>'+
+  (r.svg?'<div class="card" style="padding:10px;margin-bottom:18px"><img alt="Visual solution" style="width:100%;border-radius:12px;background:#0b0c11" src="data:image/svg+xml;charset=utf-8,'+encodeURIComponent(r.svg)+'"></div>':'')+
+  r.steps.map((x,i)=>'<div class="st"><span class="dot">'+(i+1)+'</span><div><h3>'+esc(x.h)+'</h3><p>'+esc(x.b)+'</p></div></div>').join('')+
+  '<div class="ask"><input id="sq" placeholder="Ask a follow-up" onkeydown="if(event.key===\'Enter\')scAskBtn()"><button class="ib" id="smic" aria-label="Speak" onclick="scMic()">'+MIC+'</button><button class="ib send" aria-label="Send" onclick="scAskBtn()">'+ARROW+'</button></div><p id="sans" style="margin:10px 6px 0;color:var(--tx);white-space:pre-wrap"></p>'};
+/* ---------- account actions (local placeholders until real billing/auth is connected) ---------- */
+function cancelAsk(){openSheet('<h2 style="margin-top:6px">Cancel subscription?</h2><p style="margin-bottom:14px">Are you sure you want to cancel your Masterpath subscription?</p><button class="btn" style="background:#ff453a" onclick="cancelGo()">Yes, cancel subscription</button><div style="height:8px"></div><button class="btn g" onclick="closeSheet()">Keep my subscription</button>')}
+function cancelGo(){S.sub='canceled';save();closeSheet();render();toast('Cancellation requested')}
+function outAsk(){openSheet('<h2 style="margin-top:6px">Sign out?</h2><p style="margin-bottom:14px">You can sign back in any time.</p><button class="btn" onclick="outGo()">Sign out</button><div style="height:8px"></div><button class="btn g" onclick="closeSheet()">Stay signed in</button>')}
+function outGo(){stopSay();try{localStorage.removeItem('mp_cur')}catch(e){}S=freshS();AUTH.mode='in';AUTH.err='';closeSheet();go('home');renderSO();renderPW()}
+const AUTH={mode:'up',err:''};
+const emailOk=e=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+const accs=()=>{try{return JSON.parse(localStorage.getItem('mp_acc')||'{}')}catch(e){return{}}};
+const b64=u=>btoa(String.fromCharCode(...u));
+async function hashPw(pw,salt){const k=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveBits']);return b64(new Uint8Array(await crypto.subtle.deriveBits({name:'PBKDF2',salt,iterations:150000,hash:'SHA-256'},k,256)))}
+function enter(em,name){localStorage.setItem('mp_cur',em);S=Object.assign(freshS(),JSON.parse(localStorage.getItem(DK())||'{}'));S.user={email:em,name};S.tab='home';save();renderSO();go('home');toast('Welcome, '+name);setTimeout(offerTrial,1200);renderPW()}
+async function authGo(){
+ const em=$('#ae').value.trim().toLowerCase(),pw=$('#ap').value,nm=AUTH.mode==='up'?$('#an').value.trim():'',fail=m=>{AUTH.err=m;renderSO()};
+ if(!emailOk(em))return fail('Enter a valid email address.');
+ if(pw.length<8)return fail('Password must be at least 8 characters.');
+ try{const A=accs();
+  if(AUTH.mode==='up'){if(A[em])return fail('An account with that email already exists. Try signing in.');
+   const salt=crypto.getRandomValues(new Uint8Array(16));A[em]={name:nm||em.split('@')[0],salt:b64(salt),hash:await hashPw(pw,salt)};localStorage.setItem('mp_acc',JSON.stringify(A));enter(em,A[em].name)}
+  else{const a=A[em];if(!a)return fail('No account found for that email. Create one first.');
+   if(await hashPw(pw,Uint8Array.from(atob(a.salt),c=>c.charCodeAt(0)))!==a.hash)return fail('Incorrect password.');enter(em,a.name)}
+ }catch(e){fail('Something went wrong. Try again.')}}
+function guestGo(){localStorage.setItem('mp_cur','guest');S=Object.assign(freshS(),JSON.parse(localStorage.getItem(DK())||'{}'));S.user={email:'Progress saved on this device',name:'Guest',guest:true};S.tab='home';save();renderSO();go('home');toast('Welcome! You’re in guest mode');setTimeout(offerTrial,1200);renderPW()}
+function renderSO(){const o=$('#so');if(localStorage.getItem('mp_cur')){o.style.display='none';return}
+ const up=AUTH.mode==='up',inp='class="sinp" style="width:100%;margin-bottom:10px;padding:14px;font-size:16px"';
+ o.style.display='flex';o.innerHTML='<div style="width:100%;max-width:340px;margin:auto 0"><div style="font-size:50px">🧭</div><h1>Masterpath</h1><p style="margin-bottom:18px">'+(up?'Create your account to start learning.':'Welcome back. Sign in to continue.')+'</p>'+
+  
+  (up?'<input id="an" '+inp+' placeholder="Your name" autocomplete="name">':'')+'<input id="ae" '+inp+' type="email" placeholder="Email" autocomplete="email"><input id="ap" '+inp+' type="password" placeholder="Password (8+ characters)" autocomplete="'+(up?'new-password':'current-password')+'">'+
+  (AUTH.err?'<p style="color:var(--warn);margin-bottom:10px">'+esc(AUTH.err)+'</p>':'')+'<button class="btn" onclick="authGo()">'+(up?'Create account':'Sign in')+'</button>'+
+  '<p style="margin-top:16px">'+(up?'Already have an account? ':'New here? ')+'<a href="#" style="color:var(--ac);font-weight:600;text-decoration:none" onclick="AUTH.mode=\''+(up?'in':'up')+'\';AUTH.err=\'\';renderSO();return false">'+(up?'Sign in':'Create an account')+'</a></p><button class="btn g" onclick="guestGo()">Continue as Guest</button></div>'}
+renderSO();
+/* ---------- free-trial offer (UI only: connect startTrial to your real billing) ---------- */
+const fmtD=d=>new Date(d).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});
+function offerTrial(){
+ if(!localStorage.getItem('mp_cur')||S.trial||S.sub==='active')return;
+ S.offerAt=Date.now();save();const end=fmtD(Date.now()+14*864e5);
+ const row=(e,t)=>'<div class="row" style="margin-bottom:10px"><span style="font-size:20px">'+e+'</span><span class="sp" style="font-weight:500">'+t+'</span><span style="color:var(--ok);font-weight:700">✓</span></div>';
+ const tl=(h,t,last)=>'<div style="display:flex;gap:12px"><div style="display:flex;flex-direction:column;align-items:center"><span style="width:12px;height:12px;border-radius:50%;background:var(--ac2);margin-top:5px"></span>'+(last?'':'<span style="flex:1;width:2px;background:var(--bd);margin:3px 0"></span>')+'</div><div style="padding-bottom:'+(last?0:12)+'px"><b style="font-size:15px">'+h+'</b><p>'+t+'</p></div></div>';
+ LOCKSHEET=true;openSheet('<div style="border-radius:24px;padding:22px 18px;text-align:center;margin-bottom:14px;background:linear-gradient(145deg,rgba(111,124,224,.38),rgba(60,191,163,.2));border:1px solid var(--bd)"><div style="font-size:12px;font-weight:800;letter-spacing:1px;color:var(--ac2)">MASTERPATH</div><h1 style="font-size:30px;margin:8px 0 6px">Try it free for 14 days</h1><p style="color:var(--tx);font-size:16px">Then <b style="font-size:22px">$1.25</b> per month to keep using the app</p></div>'+
+  row('📷','Scan anything with your camera')+row('🗺️','Personalized learning paths for any skill')+row('🎧','Coaching in your learning style')+row('🎙️','Two-way voice tutor')+
+  '<div class="card" style="margin:12px 0">'+tl('Today','Your free trial starts. No payment needed.')+tl(end,'Your trial ends. Subscribe for $1.25/month to keep using Masterpath.')+tl('After your trial','Your paths and progress stay saved while you decide.',true)+'</div>'+
+  '<button class="btn" onclick="startTrial()">Start 14-day free trial</button>'+
+  '<p style="font-size:12px;text-align:center;margin-top:12px">Free for 14 days, with no payment needed to start. After your trial, a $1.25 per month subscription (USD) is required to keep using Masterpath, billed monthly until you cancel. Taxes may apply.</p>')}
+function startTrial(){const n=Date.now();S.trial={start:n,end:n+14*864e5};S.sub='trial';save();closeSheet();render();toast('Free trial started · ends '+fmtD(S.trial.end))}
+if(localStorage.getItem('mp_cur'))setTimeout(offerTrial,1200);
+/* ---------- paywall: after the 14-day trial, the app stays on "Subscribe now" until subscribed ---------- */
+function locked(){return !!(S.trial&&Date.now()>=S.trial.end&&S.sub!=='active')}
+function renderPW(){const o=$('#pw');if(!o)return;if(!localStorage.getItem('mp_cur')||!locked()){o.style.display='none';return}
+ o.style.zIndex=65;o.style.display='flex';
+ o.innerHTML='<div style="width:100%;max-width:340px;margin:auto 0"><div style="font-size:46px">⏳</div><h1 style="font-size:28px">Your free trial has ended</h1><p style="margin:8px 0 18px;color:var(--tx);font-size:16px">Subscribe now to continue using Masterpath.</p><div class="ans" style="margin:0 0 14px;text-align:center"><div style="font-size:40px;font-weight:800;letter-spacing:-1px">$1.25<span style="font-size:16px;font-weight:600;color:var(--mut)"> / month</span></div><p style="margin-top:6px">Your paths, badges and progress are saved and waiting for you.</p></div><button class="btn" onclick="subscribeNow()">Subscribe now</button><p style="font-size:12px;margin-top:12px">Billed monthly until you cancel. Cancel anytime in Profile. Taxes may apply.</p><div style="margin-top:14px"><a href="#" style="color:var(--mut);font-size:14px;text-decoration:none" onclick="outGo();return false">Sign out</a></div></div>'}
+function subscribeNow(){S.sub='active';S.paidAt=Date.now();save();renderPW();render();toast('Thanks for subscribing')}
+renderPW();setInterval(renderPW,30000);
+/* ---------- motion + engagement ---------- */
+const PHR=['quantum computing','boxing footwork','sourdough bread','financial accounting','sprinting','public speaking','guitar chords','Python basics'];let PHI=0;
+setInterval(()=>{const w=document.getElementById('phw');if(!w||S.tab!=='home')return;w.classList.add('out');setTimeout(()=>{PHI=(PHI+1)%PHR.length;w.textContent=PHR[PHI];w.classList.remove('out');w.classList.add('pre');void w.offsetWidth;w.classList.remove('pre')},400)},2600);
+function nextT(p){for(let a=0;a<p.phases.length;a++)for(let b=0;b<p.phases[a].tasks.length;b++)if(!p.phases[a].tasks[b].done)return[a,b];return null}
+function contCard(){const p=S.paths.find(x=>!x.done&&nextT(x));if(!p)return '';const[a,b]=nextT(p),t=p.phases[a].tasks[b];
+ return '<div class="ans" style="margin:6px 0 0;cursor:pointer" onclick="coach('+p.id+','+a+','+b+')"><p style="color:var(--ac2);font-weight:700;font-size:12px;letter-spacing:.8px">CONTINUE</p><h3 style="font-size:18px;margin:4px 0">'+esc(t.t)+'</h3><p>'+esc(p.topic)+' · '+pct(p)+'% to Mastery</p><button class="btn" style="margin-top:12px">Continue ›</button></div>'}
+function burst(){const c=document.createElement('div');c.className='cf';const cols=['#6f7ce0','#3cbfa3','#d9ac5a','#9a6fe0','#e08a3a'];
+ for(let i=0;i<26;i++){const e=document.createElement('i'),an=Math.random()*Math.PI*2,d=90+Math.random()*130;e.style.cssText='--x:'+Math.cos(an)*d+'px;--y:'+(Math.sin(an)*d-60)+'px;--r:'+(Math.random()*720-360)+'deg;background:'+cols[i%5]+';animation-delay:'+(Math.random()*.08)+'s';c.appendChild(e)}
+ $('#app').appendChild(c);setTimeout(()=>c.remove(),1400);try{navigator.vibrate&&navigator.vibrate(15)}catch(e){}}
+document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('button,.chip,.opt,.act,.badge')){try{navigator.vibrate&&navigator.vibrate(8)}catch(_){}}},true);
+go("home");
+</script></body></html>
