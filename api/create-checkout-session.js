@@ -14,6 +14,9 @@ export default async function handler(req, res) {
           },
         ],
         mode: 'subscription',
+        subscription_data: {
+          trial_period_days: 14, // Automatically gives them 2 weeks free before billing $1.25/mo!
+        },
         success_url: `${req.headers.origin}/?success=true`,
         cancel_url: `${req.headers.origin}/?canceled=true`,
         client_reference_id: userId, // Links the payment back to the Supabase user ID
