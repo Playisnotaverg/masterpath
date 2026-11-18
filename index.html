@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark"><title>Masterpath</title>
@@ -19,7 +19,7 @@ h2{font-size:21px;letter-spacing:-.4px;margin:22px 0 10px}
 h3{font-size:16px;margin:0 0 3px}
 p{margin:0;color:var(--mut);font-size:14px;line-height:1.45}
 .card{background:var(--glass);backdrop-filter:blur(22px) saturate(160%);-webkit-backdrop-filter:blur(22px) saturate(160%);border:1px solid var(--bd);border-radius:22px;padding:16px;margin-bottom:12px}
-.btn{border:0;border-radius:16px;padding:14px 18px;font:600 16px var(--font);color:#fff;background:linear-gradient(135deg,var(--ac),#8a63d6);width:100%;cursor:pointer;transition:transform .25s var(--sp)}
+.btn{border:0;border-radius:16px;padding<:14px 18px;font:600 16px var(--font);color:#fff;background:linear-gradient(135deg,var(--ac),#8a63d6);width:100%;cursor:pointer;transition:transform .25s var(--sp)}
 .btn:active{transform:scale(.96)}.btn.g{background:var(--glass);color:var(--tx);border:1px solid var(--bd)}
 .btn:disabled{opacity:.45}
 .search{display:flex;align-items:flex-start;gap:10px;padding:14px 16px;border-radius:22px;background:var(--glass);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border:1px solid var(--bd);margin:14px 0 10px}
@@ -631,4 +631,32 @@ function burst(){const c=document.createElement('div');c.className='cf';const co
  $('#app').appendChild(c);setTimeout(()=>c.remove(),1400);try{navigator.vibrate&&navigator.vibrate(15)}catch(e){}}
 document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('button,.chip,.opt,.act,.badge')){try{navigator.vibrate&&navigator.vibrate(8)}catch(_){}}},true);
 go("home");
+
+
+
+ // Stripe Checkout Handler for 2-Week Trial / Continued Access
+async function handleStripeCheckout() {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    const userId = user ? user.id : 'anonymous';
+
+    const response = await fetch('/api/create-checkout-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId })
+    });
+
+    const data = await response.json();
+    
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert('Could not initiate checkout. Please try again.');
+    }
+  } catch (error) {
+    console.error('Checkout error:', error);
+  }
+}
+
+
 </script></body></html>
